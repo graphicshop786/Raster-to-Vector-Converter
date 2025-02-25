@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert raster images to vector SVG with stunning 3D effects and neon design. Powered by xAI.">
+    <meta name="keywords" content="raster to vector, SVG converter, 3D image tool, neon design, free converter">
+    <meta name="author" content="xAI">
+    <meta name="robots" content="index, follow">
+    <title>Raster to Vector Converter - 3D Neon Edition</title>
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" as="style" onload="this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js" as="script">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Raster to Vector Converter</h1>
+        <div class="dropzone" id="dropzone" role="region" aria-label="Drag and drop or click to upload an image">
+            <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;" aria-hidden="true">
+            <p>Drag & Drop or Click to Upload an Image</p>
+        </div>
+        <div class="settings">
+            <label title="Controls the level of detail in the vector output (0.1 = low, 2 = high)">
+                Detail Level: <input type="range" id="detailLevel" min="0.1" max="2" step="0.1" value="1">
+            </label>
+            <label title="Choose between color or black-and-white output">
+                Color Mode:
+                <select id="colorMode">
+                    <option value="color">Color</option>
+                    <option value="black">Black & White</option>
+                    <option value="cyberpunk">Cyberpunk Neon</option>
+                </select>
+            </label>
+            <label title="Adjust the size of the output vector (0.1 = small, 5 = large)">
+                Scale: <input type="number" id="scale" min="0.1" max="5" step="0.1" value="1">
+            </label>
+            <label title="Toggle dark mode for better visibility">
+                Theme: <input type="checkbox" id="darkMode"> Dark Mode
+            </label>
+        </div>
+        <div class="preview">
+            <canvas id="rasterCanvas" role="img" aria-label="Preview of uploaded raster image"></canvas>
+            <div class="zoom-controls">
+                <button onclick="uiControls.zoomCanvas(1.2)" aria-label="Zoom in on preview">+</button>
+                <button onclick="uiControls.zoomCanvas(0.8)" aria-label="Zoom out on preview">-</button>
+            </div>
+        </div>
+        <div id="progressBar">
+            <div id="progressFill"></div>
+        </div>
+        <p id="progressText">Converting...</p>
+        <p id="fileSize"></p>
+        <div class="output" id="vectorOutput" role="img" aria-label="Vectorized output">
+            <div class="zoom-controls">
+                <button onclick="uiControls.zoomOutput(1.2)" aria-label="Zoom in on output">+</button>
+                <button onclick="uiControls.zoomOutput(0.8)" aria-label="Zoom out on output">-</button>
+            </div>
+        </div>
+        <button id="downloadBtn" style="display: none;">Download SVG</button>
+        <button id="resetBtn">Reset</button>
+        <button id="undoBtn" style="display: none;">Undo</button>
+    </div>
+
+    <div id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2025 | <a href="https://www.facebook.com/graphicshop786" target="_blank">Bilal Hussain</a></p>
+            <p>Contact: <a href="/cdn-cgi/l/email-protection#d3b4a1b2a3bbbab0a0bbbca3e4ebe593b4beb2babffdb0bcbe">
+                <span class="__cf_email__" data-cfemail="3d5a4f5c4d55545e4e55524d0a050b7d5a505c5451135e5250">[email&#160;protected]</span>
+            </a> | Phone: +923401617879</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+</body>
+</html>
