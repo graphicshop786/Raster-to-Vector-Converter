@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer - Resize Images Online</title>
+    <meta name="description" content="Free online tool to resize images while maintaining aspect ratio. Upload your image and specify new dimensions.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Image Resizer</h1>
+                <p class="lead">Resize your images while maintaining aspect ratio</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="image-input" class="form-label">Upload Image:</label>
+                        <input type="file" class="form-control" id="image-input" accept="image/*">
+                        <div class="form-text">Supported formats: JPG, PNG, GIF, WebP</div>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="width" class="form-label">Width (px):</label>
+                            <input type="number" class="form-control" id="width" placeholder="Enter width">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="height" class="form-label">Height (px):</label>
+                            <input type="number" class="form-control" id="height" placeholder="Enter height">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="maintain-ratio" checked>
+                                <label class="form-check-label" for="maintain-ratio">
+                                    Maintain aspect ratio
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100" onclick="resizeImage()">
+                                <i class="fas fa-compress-alt me-2"></i>Resize Image
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Original Image</h5>
+                                <div class="image-preview-container">
+                                    <img id="original-preview" class="img-fluid" style="display: none;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Resized Image</h5>
+                                <div class="image-preview-container">
+                                    <img id="resized-preview" class="img-fluid" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="downloadImage()" id="download-btn" style="display: none;">
+                            <i class="fas fa-download me-2"></i>Download Resized Image
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearImage()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Image Resizing</h3>
+                    <p>This tool helps you resize images while maintaining their aspect ratio. Features include:</p>
+                    <ul>
+                        <li>Resize images to specific dimensions</li>
+                        <li>Maintain aspect ratio automatically</li>
+                        <li>Preview original and resized images</li>
+                        <li>Download resized image</li>
+                        <li>Support for common image formats</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Image Resizer Tool JavaScript
+        let originalImage = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('image-input');
+            const maintainRatio = document.getElementById('maintain-ratio');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+
+            // Handle image upload
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        originalImage = new Image();
+                        originalImage.onload = function() {
+                            document.getElementById('original-preview').src = e.target.result;
+                            document.getElementById('original-preview').style.display = 'block';
+                            document.getElementById('download-btn').style.display = 'none';
+                            
+                            // Set initial dimensions
+                            widthInput.value = originalImage.width;
+                            heightInput.value = originalImage.height;
+                        };
+                        originalImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle aspect ratio maintenance
+            maintainRatio.addEventListener('change', function() {
+                if (this.checked && originalImage) {
+                    const ratio = originalImage.width / originalImage.height;
+                    if (widthInput.value) {
+                        heightInput.value = Math.round(widthInput.value / ratio);
+                    } else if (heightInput.value) {
+                        widthInput.value = Math.round(heightInput.value * ratio);
+                    }
+                }
+            });
+
+            // Update dimensions while maintaining ratio
+            widthInput.addEventListener('input', function() {
+                if (maintainRatio.checked && originalImage) {
+                    const ratio = originalImage.width / originalImage.height;
+                    heightInput.value = Math.round(this.value / ratio);
+                }
+            });
+
+            heightInput.addEventListener('input', function() {
+                if (maintainRatio.checked && originalImage) {
+                    const ratio = originalImage.width / originalImage.height;
+                    widthInput.value = Math.round(this.value * ratio);
+                }
+            });
+        });
+
+        function resizeImage() {
+            if (!originalImage) {
+                alert('Please upload an image first');
+                return;
+            }
+
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+
+            if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+                alert('Please enter valid dimensions');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // Draw resized image
+            ctx.drawImage(originalImage, 0, 0, width, height);
+
+            // Display resized image
+            const resizedPreview = document.getElementById('resized-preview');
+            resizedPreview.src = canvas.toDataURL('image/png');
+            resizedPreview.style.display = 'block';
+            document.getElementById('download-btn').style.display = 'block';
+        }
+
+        function downloadImage() {
+            const resizedPreview = document.getElementById('resized-preview');
+            if (resizedPreview.src) {
+                const link = document.createElement('a');
+                link.download = 'resized-image.png';
+                link.href = resizedPreview.src;
+                link.click();
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('original-preview').style.display = 'none';
+            document.getElementById('resized-preview').style.display = 'none';
+            document.getElementById('download-btn').style.display = 'none';
+            document.getElementById('width').value = '';
+            document.getElementById('height').value = '';
+            originalImage = null;
+        }
+    </script>
+</body>
+</html> 

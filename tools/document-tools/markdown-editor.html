@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor - Free Document Tools</title>
+    <meta name="description" content="Free online Markdown editor with live preview. Write and preview Markdown in real-time.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .editor-pane, .preview-pane {
+            flex: 1;
+            min-height: 500px;
+        }
+        .preview-pane {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .CodeMirror {
+            height: 500px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Markdown Editor</h1>
+                <p class="lead">Write and preview Markdown in real-time</p>
+            </div>
+
+            <div class="tool-content">
+                <!-- Editor Container -->
+                <div class="editor-container">
+                    <div class="editor-pane">
+                        <label for="markdown-editor" class="visually-hidden">Markdown Editor</label>
+                        <textarea id="markdown-editor" aria-label="Markdown editor"></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mb-4">
+                    <button id="save-md" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save as Markdown
+                    </button>
+                    <button id="save-html" class="btn btn-secondary">
+                        <i class="fas fa-code me-2"></i>Save as HTML
+                    </button>
+                    <button id="copy-html" class="btn btn-info">
+                        <i class="fas fa-copy me-2"></i>Copy HTML
+                    </button>
+                    <button id="clear-editor" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Clear
+                    </button>
+                </div>
+
+                <!-- Instructions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">How to Use</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Write your Markdown in the editor</li>
+                            <li>See the live preview on the right</li>
+                            <li>Use the toolbar for common formatting</li>
+                            <li>Save your work as Markdown or HTML</li>
+                            <li>Copy the HTML directly to clipboard</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Markdown Reference -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Markdown Quick Reference</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Basic Syntax</h6>
+                                <ul class="list-unstyled">
+                                    <li><code># Heading 1</code></li>
+                                    <li><code>## Heading 2</code></li>
+                                    <li><code>**bold**</code></li>
+                                    <li><code>*italic*</code></li>
+                                    <li><code>[Link](url)</code></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Extended Syntax</h6>
+                                <ul class="list-unstyled">
+                                    <li><code>```code block```</code></li>
+                                    <li><code>- list item</code></li>
+                                    <li><code>1. numbered list</code></li>
+                                    <li><code>> blockquote</code></li>
+                                    <li><code>---</code> (horizontal rule)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- EasyMDE for Markdown editing -->
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    
+    <!-- Marked for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/document-tools/markdown-editor.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize EasyMDE
+            const easyMDE = new EasyMDE({
+                element: document.getElementById('markdown-editor'),
+                autofocus: true,
+                spellChecker: false,
+                status: ['lines', 'words', 'cursor'],
+                previewRender: function(plainText) {
+                    return marked.parse(plainText);
+                }
+            });
+
+            // Save as Markdown
+            document.getElementById('save-md').addEventListener('click', function() {
+                const content = easyMDE.value();
+                downloadFile(content, 'document.md', 'text/markdown');
+            });
+
+            // Save as HTML
+            document.getElementById('save-html').addEventListener('click', function() {
+                const content = marked.parse(easyMDE.value());
+                downloadFile(content, 'document.html', 'text/html');
+            });
+
+            // Copy HTML
+            document.getElementById('copy-html').addEventListener('click', function() {
+                const content = marked.parse(easyMDE.value());
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('HTML copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy HTML. Please try again.');
+                });
+            });
+
+            // Clear Editor
+            document.getElementById('clear-editor').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear the editor? This cannot be undone.')) {
+                    easyMDE.value('');
+                }
+            });
+
+            // Helper function to download files
+            function downloadFile(content, filename, contentType) {
+                const blob = new Blob([content], { type: contentType });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+
+            // Set initial content
+            easyMDE.value(`# Welcome to the Markdown Editor
+
+This is a live Markdown editor. Start typing to see the preview!
+
+## Features
+
+- Real-time preview
+- Syntax highlighting
+- Common Markdown shortcuts
+- Export to Markdown or HTML
+
+## Try it out!
+
+1. Write some **bold** text
+2. Add some *italic* text
+3. Create a [link](https://example.com)
+4. Make a list like this one
+
+> You can also create blockquotes
+
+\`\`\`
+And code blocks too!
+\`\`\`
+`);
+        });
+    </script>
+</body>
+</html> 

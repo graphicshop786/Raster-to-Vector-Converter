@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me - Bilal Hussain</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-color: #1000BF;
+            --secondary-color: #0A0080;
+            --accent-color: #4B44F2;
+            --gradient-bg: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+        }
+
+        body {
+            background: var(--gradient-bg);
+        }
+
+        .custom-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .custom-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .custom-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--secondary-color);
+        }
+
+        h1::after, h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .custom-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .custom-list li {
+            margin-bottom: 1.2rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            background: rgba(16, 0, 191, 0.02);
+        }
+
+        .custom-list li:hover {
+            transform: translateX(10px);
+            background: rgba(16, 0, 191, 0.05);
+            box-shadow: 0 5px 15px rgba(16, 0, 191, 0.1);
+        }
+
+        .custom-list li i {
+            margin-right: 1.2rem;
+            font-size: 1.4rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(16, 0, 191, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .custom-list li:hover i {
+            transform: scale(1.1);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .portfolio-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            background: rgba(16, 0, 191, 0.05);
+        }
+
+        .portfolio-link:hover {
+            background: rgba(16, 0, 191, 0.1);
+            text-decoration: none;
+            transform: translateX(5px);
+            color: var(--primary-color);
+        }
+
+        .portfolio-link i {
+            margin-right: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-link:hover i {
+            transform: translateX(3px);
+        }
+
+        .contact-info {
+            background: rgba(16, 0, 191, 0.03);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            box-shadow: 0 5px 20px rgba(16, 0, 191, 0.05);
+        }
+
+        .contact-info p {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-info i {
+            margin-right: 1.2rem;
+            font-size: 1.4rem;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(16, 0, 191, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-info p:hover i {
+            transform: scale(1.1);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            margin: 3rem 0;
+            border-radius: 1px;
+            opacity: 0.2;
+        }
+
+        .ad-space {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            border: 2px dashed var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .ad-space:hover {
+            border-style: solid;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 0, 191, 0.1);
+        }
+
+        .ad-space p {
+            color: var(--secondary-color);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        strong {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Top Ad Space -->
+    <div class="container mt-4">
+        <div class="ad-space animate-fadeInUp">
+            <p>Advertisement Space</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="custom-container animate-fadeInUp">
+                    <div class="card-body">
+                        <h1>About Me</h1>
+                        <p class="lead">I am <strong>Bilal Hussain</strong>, a <strong>graphic designer, web developer, CNC machine
+                                operator, electric welder, and TP/CR machine operator</strong>. I specialize in
+                            <strong>WordPress web design</strong> and <strong>Elementor</strong>, with expertise in
+                            creating <strong>custom WordPress themes and plugins</strong>.</p>
+
+                        <div class="section-divider"></div>
+
+                        <h2>My Services</h2>
+                        <ul class="custom-list">
+                            <li><i class="fas fa-check-circle"></i> <strong>WordPress Web Design & Development</strong></li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Custom WordPress Themes & Plugins</strong></li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Graphic Designing (Logos, Banners, UI/UX Design)</strong></li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Laser Engraving & CNC Machine Operations</strong></li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Road Safety Product Installation (Speed Breakers & Cat Eyes)</strong></li>
+                        </ul>
+
+                        <!-- Side Ad Space -->
+                        <div class="ad-space my-4">
+                            <p>Advertisement Space</p>
+                        </div>
+
+                        <div class="section-divider"></div>
+
+                        <h2>My Websites</h2>
+                        <ul class="custom-list">
+                            <li><a href="https://grumium-tech.com/" target="_blank" rel="noopener" class="portfolio-link">
+                                <i class="fas fa-globe"></i> Grumium Technologies</a></li>
+                            <li><a href="https://Getechpk.com" target="_blank" rel="noopener" class="portfolio-link">
+                                <i class="fas fa-globe"></i> Getech PK</a></li>
+                            <li><a href="https://Exactus-mb.com" target="_blank" rel="noopener" class="portfolio-link">
+                                <i class="fas fa-globe"></i> Exactus MB</a></li>
+                        </ul>
+
+                        <div class="section-divider"></div>
+
+                        <h2>My Graphic Design Portfolio</h2>
+                        <p><a href="https://drive.google.com/drive/folders/1Hb4Nl8pOQt8_7ktX_SlpgG-0D1KJlC6N" target="_blank" rel="noopener" class="portfolio-link">
+                            <i class="fas fa-folder-open"></i> View My Portfolio
+                        </a></p>
+
+                        <div class="section-divider"></div>
+
+                        <h2>My Community</h2>
+                        <p><a href="https://www.whatsapp.com/channel/0029VapiShZB4hdWr9xe900f" target="_blank" rel="noopener" class="portfolio-link">
+                            <i class="fab fa-whatsapp"></i> LEARN WITH BILAL
+                        </a></p>
+
+                        <div class="section-divider"></div>
+
+                        <h2>Contact Me</h2>
+                        <div class="contact-info">
+                            <p><i class="fas fa-phone"></i> <strong>Phone:</strong> +923401617879</p>
+                            <p><i class="fas fa-envelope"></i> <strong>Email:</strong> 
+                                <a href="mailto:graphicshop786@gmail.com" class="portfolio-link">graphicshop786@gmail.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Ad Space -->
+    <div class="container mb-4">
+        <div class="ad-space animate-fadeInUp">
+            <p>Advertisement Space</p>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+
+</html>

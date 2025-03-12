@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Encoder & Decoder - Encode and Decode URLs</title>
+    <meta name="description" content="Free online tool to encode and decode URLs and special characters. Perfect for web developers and content creators.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>URL Encoder & Decoder</h1>
+                <p class="lead">Encode and decode URLs and special characters</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="input-text" class="form-label">Enter text to encode/decode:</label>
+                        <textarea class="form-control" id="input-text" rows="4" placeholder="Enter URL or text with special characters..."></textarea>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="encodeURL()">
+                                <i class="fas fa-lock me-2"></i>Encode URL
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="decodeURL()">
+                                <i class="fas fa-lock-open me-2"></i>Decode URL
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="encodeBase64()">
+                                <i class="fas fa-code me-2"></i>Encode Base64
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="decodeBase64()">
+                                <i class="fas fa-code me-2"></i>Decode Base64
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="output-text" class="form-label">Result:</label>
+                        <textarea class="form-control" id="output-text" rows="4" readonly></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy me-2"></i>Copy to Clipboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearText()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About URL Encoding</h3>
+                    <p>URL encoding converts special characters into a format that can be transmitted over the internet. Common uses include:</p>
+                    <ul>
+                        <li>Encoding spaces as %20</li>
+                        <li>Encoding special characters in URLs</li>
+                        <li>Encoding non-ASCII characters</li>
+                        <li>Encoding query parameters</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // URL Encoder & Decoder Tool JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+
+            // Initialize with empty text
+            outputText.value = '';
+        });
+
+        function encodeURL() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            outputText.value = encodeURIComponent(inputText.value);
+        }
+
+        function decodeURL() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            try {
+                outputText.value = decodeURIComponent(inputText.value);
+            } catch (error) {
+                outputText.value = 'Error: Invalid URL encoding';
+            }
+        }
+
+        function encodeBase64() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            try {
+                outputText.value = btoa(inputText.value);
+            } catch (error) {
+                outputText.value = 'Error: Invalid characters for Base64 encoding';
+            }
+        }
+
+        function decodeBase64() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            try {
+                outputText.value = atob(inputText.value);
+            } catch (error) {
+                outputText.value = 'Error: Invalid Base64 string';
+            }
+        }
+
+        function copyToClipboard() {
+            const outputText = document.getElementById('output-text');
+            outputText.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function clearText() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counter - Free Online Tools</title>
+    <meta name="description" content="Count words, characters, and paragraphs in your text with our free online Word Counter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Word Counter</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label">Enter or paste your text</label>
+                            <textarea class="form-control" id="textInput" rows="10" placeholder="Type or paste your text here..."></textarea>
+                        </div>
+                        
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body">
+                                        <h3 id="wordCount">0</h3>
+                                        <p class="mb-0">Words</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h3 id="charCount">0</h3>
+                                        <p class="mb-0">Characters</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h3 id="charNoSpaces">0</h3>
+                                        <p class="mb-0">Chars (no spaces)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body">
+                                        <h3 id="paragraphCount">0</h3>
+                                        <p class="mb-0">Paragraphs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Additional Statistics</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>Sentences</td>
+                                        <td id="sentenceCount">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Word Length</td>
+                                        <td id="avgWordLength">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reading Time</td>
+                                        <td id="readingTime">0 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Speaking Time</td>
+                                        <td id="speakingTime">0 min</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <h6>Keyword Density (Top 5)</h6>
+                            <ul id="keywordDensity" class="list-group">
+                                <!-- Keywords will be added here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const textInput = document.getElementById('textInput');
+        
+        function countWords(text) {
+            return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+        
+        function countCharacters(text, includeSpaces = true) {
+            return includeSpaces ? text.length : text.replace(/\s/g, '').length;
+        }
+        
+        function countParagraphs(text) {
+            return text.split(/\n\s*\n/).filter(para => para.trim().length > 0).length;
+        }
+        
+        function countSentences(text) {
+            return text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0).length;
+        }
+        
+        function calculateAverageWordLength(text) {
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            if (words.length === 0) return 0;
+            const totalLength = words.reduce((sum, word) => sum + word.length, 0);
+            return (totalLength / words.length).toFixed(1);
+        }
+        
+        function calculateReadingTime(wordCount) {
+            const wordsPerMinute = 200;
+            return Math.ceil(wordCount / wordsPerMinute);
+        }
+        
+        function calculateSpeakingTime(wordCount) {
+            const wordsPerMinute = 130;
+            return Math.ceil(wordCount / wordsPerMinute);
+        }
+        
+        function getKeywordDensity(text) {
+            const words = text.toLowerCase().trim().split(/\s+/).filter(word => word.length > 0);
+            const wordCount = {};
+            
+            words.forEach(word => {
+                if (word.length > 3) { // Only count words longer than 3 characters
+                    wordCount[word] = (wordCount[word] || 0) + 1;
+                }
+            });
+            
+            return Object.entries(wordCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([word, count]) => ({
+                    word,
+                    count,
+                    percentage: ((count / words.length) * 100).toFixed(1)
+                }));
+        }
+        
+        function updateCounts() {
+            const text = textInput.value;
+            
+            // Update main counts
+            document.getElementById('wordCount').textContent = countWords(text);
+            document.getElementById('charCount').textContent = countCharacters(text);
+            document.getElementById('charNoSpaces').textContent = countCharacters(text, false);
+            document.getElementById('paragraphCount').textContent = countParagraphs(text);
+            
+            // Update additional statistics
+            const wordCount = countWords(text);
+            document.getElementById('sentenceCount').textContent = countSentences(text);
+            document.getElementById('avgWordLength').textContent = calculateAverageWordLength(text);
+            document.getElementById('readingTime').textContent = `${calculateReadingTime(wordCount)} min`;
+            document.getElementById('speakingTime').textContent = `${calculateSpeakingTime(wordCount)} min`;
+            
+            // Update keyword density
+            const keywordsList = document.getElementById('keywordDensity');
+            keywordsList.innerHTML = '';
+            
+            const keywords = getKeywordDensity(text);
+            keywords.forEach(({ word, count, percentage }) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    ${word}
+                    <span>
+                        <span class="badge bg-primary rounded-pill me-2">${count}x</span>
+                        <span class="badge bg-secondary rounded-pill">${percentage}%</span>
+                    </span>
+                `;
+                keywordsList.appendChild(li);
+            });
+        }
+        
+        // Update counts on input
+        textInput.addEventListener('input', updateCounts);
+        
+        // Initialize counts
+        updateCounts();
+    </script>
+</body>
+</html> 

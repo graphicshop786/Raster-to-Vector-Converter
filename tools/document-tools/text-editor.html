@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Text Editor - Free Document Tools</title>
+    <meta name="description" content="Free online text editor with rich formatting options. Edit text, format content, and save your work.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.snow.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Online Text Editor</h1>
+                <p class="lead">A simple yet powerful text editor with formatting options</p>
+            </div>
+
+            <div class="tool-content">
+                <!-- Editor Container -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div id="editor-container" style="height: 400px;"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mb-4">
+                    <button id="save-doc" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save as Text
+                    </button>
+                    <button id="save-html" class="btn btn-secondary">
+                        <i class="fas fa-code me-2"></i>Save as HTML
+                    </button>
+                    <button id="clear-editor" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Clear
+                    </button>
+                </div>
+
+                <!-- Instructions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">How to Use</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Start typing in the editor above</li>
+                            <li>Use the toolbar to format your text</li>
+                            <li>Click "Save as Text" to download as plain text</li>
+                            <li>Click "Save as HTML" to download with formatting</li>
+                            <li>Use "Clear" to start fresh</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Quill.js for rich text editing -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/document-tools/text-editor.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Quill editor
+            const quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Start typing here...'
+            });
+
+            // Save as Text
+            document.getElementById('save-doc').addEventListener('click', function() {
+                const text = quill.getText();
+                downloadFile(text, 'document.txt', 'text/plain');
+            });
+
+            // Save as HTML
+            document.getElementById('save-html').addEventListener('click', function() {
+                const html = quill.root.innerHTML;
+                downloadFile(html, 'document.html', 'text/html');
+            });
+
+            // Clear Editor
+            document.getElementById('clear-editor').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear the editor? This cannot be undone.')) {
+                    quill.setText('');
+                }
+            });
+
+            // Helper function to download files
+            function downloadFile(content, filename, contentType) {
+                const blob = new Blob([content], { type: contentType });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+        });
+    </script>
+</body>
+</html> 

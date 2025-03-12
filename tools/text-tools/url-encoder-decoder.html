@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Encoder & Decoder - Free Online Tools</title>
+    <meta name="description" content="Encode and decode URLs with our free online URL Encoder & Decoder tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">URL Encoder & Decoder</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Input Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">Enter URL or text</label>
+                            <textarea class="form-control" id="inputText" rows="5" placeholder="Enter your URL or text here..."></textarea>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button class="btn btn-primary w-100" onclick="encodeURL()">
+                                    <i class="fas fa-lock"></i> Encode URL
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-success w-100" onclick="decodeURL()">
+                                    <i class="fas fa-unlock"></i> Decode URL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Result</h5>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="outputText" rows="5" readonly title="Encoded or decoded result"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary" onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i> Copy to Clipboard
+                            </button>
+                            <button class="btn btn-danger" onclick="clearText()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Options</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="encodeSpaces" checked>
+                            <label class="form-check-label" for="encodeSpaces">
+                                Encode spaces as %20 (instead of +)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="encodeAll">
+                            <label class="form-check-label" for="encodeAll">
+                                Encode all characters (including reserved characters)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Conversions</h5>
+                        <div class="list-group" id="historyList">
+                            <!-- History items will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const historyList = document.getElementById('historyList');
+        const encodeSpaces = document.getElementById('encodeSpaces');
+        const encodeAll = document.getElementById('encodeAll');
+        
+        function encodeURL() {
+            const text = inputText.value;
+            let result = '';
+            
+            if (encodeAll.checked) {
+                // Encode all characters
+                result = encodeURIComponent(text);
+            } else {
+                // Standard URL encoding
+                result = encodeSpaces.checked ? 
+                    encodeURIComponent(text) : 
+                    encodeURI(text).replace(/%20/g, '+');
+            }
+            
+            outputText.value = result;
+            addToHistory('Encode', text, result);
+        }
+        
+        function decodeURL() {
+            const text = inputText.value;
+            let result = '';
+            
+            try {
+                // Handle both %20 and + encodings
+                result = decodeURIComponent(text.replace(/\+/g, '%20'));
+            } catch (e) {
+                alert('Invalid URL encoding. Please check your input.');
+                return;
+            }
+            
+            outputText.value = result;
+            addToHistory('Decode', text, result);
+        }
+        
+        function copyToClipboard() {
+            outputText.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const tooltip = document.createElement('div');
+            tooltip.className = 'alert alert-success position-fixed bottom-0 end-0 m-3';
+            tooltip.textContent = 'Copied to clipboard!';
+            document.body.appendChild(tooltip);
+            
+            setTimeout(() => {
+                tooltip.remove();
+            }, 2000);
+        }
+        
+        function clearText() {
+            inputText.value = '';
+            outputText.value = '';
+        }
+        
+        function addToHistory(operation, input, output) {
+            const timestamp = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = 'list-group-item';
+            
+            const shortInput = input.length > 30 ? input.substring(0, 30) + '...' : input;
+            const shortOutput = output.length > 30 ? output.substring(0, 30) + '...' : output;
+            
+            item.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${operation}</h6>
+                        <p class="mb-1 text-muted small">Input: ${shortInput}</p>
+                        <p class="mb-1 text-muted small">Output: ${shortOutput}</p>
+                        <small class="text-muted">${timestamp}</small>
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="restoreConversion(this)" 
+                            data-input="${encodeURIComponent(input)}" 
+                            data-output="${encodeURIComponent(output)}">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            `;
+            
+            historyList.insertBefore(item, historyList.firstChild);
+            
+            // Keep only last 5 items
+            while (historyList.children.length > 5) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+        
+        function restoreConversion(button) {
+            const input = decodeURIComponent(button.dataset.input);
+            const output = decodeURIComponent(button.dataset.output);
+            
+            inputText.value = input;
+            outputText.value = output;
+        }
+        
+        // Add input event listeners
+        inputText.addEventListener('input', () => {
+            if (inputText.value.trim() === '') {
+                outputText.value = '';
+            }
+        });
+        
+        // Initialize with empty history
+        historyList.innerHTML = '<p class="text-muted mb-0 text-center">No recent conversions</p>';
+    </script>
+</body>
+</html> 

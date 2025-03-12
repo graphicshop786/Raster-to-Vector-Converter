@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Merger - Free Document Tools</title>
+    <meta name="description" content="Merge multiple PDF, DOC, DOCX, or TXT files into a single document with our free online document merger tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .drop-zone.dragover {
+            border-color: #0d6efd;
+            background: #e9ecef;
+        }
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background: white;
+        }
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+        .file-item .drag-handle {
+            cursor: move;
+            padding: 0.5rem;
+            margin-right: 1rem;
+            color: #6c757d;
+        }
+        .file-item .file-info {
+            flex-grow: 1;
+        }
+        .file-item .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .file-item .file-size {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Document Merger</h1>
+                <p class="lead">Combine multiple documents into a single file</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- File Upload Area -->
+                    <div class="drop-zone mb-4" id="dropZone">
+                        <i class="fas fa-file-upload fa-3x mb-3 text-primary"></i>
+                        <h3 class="h5">Drag & Drop Files Here</h3>
+                        <p class="text-muted mb-3">or</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open me-2"></i>Browse Files
+                        </button>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        <p class="text-muted mt-3">
+                            Supported formats: PDF, DOC, DOCX, TXT<br>
+                            Maximum 10 files, 50MB each
+                        </p>
+                    </div>
+
+                    <!-- File List -->
+                    <div class="file-list mb-4" id="fileList" style="display: none;">
+                        <h3 class="h5 mb-3">Selected Files</h3>
+                        <div id="fileItems" class="sortable-list">
+                            <!-- Files will be added here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Merger Settings -->
+                    <div class="settings-panel mb-4">
+                        <h3 class="h5 mb-3">Merger Settings</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Output Format</label>
+                                <select class="form-select" id="outputFormat">
+                                    <option value="pdf">PDF</option>
+                                    <option value="docx">DOCX</option>
+                                    <option value="txt">TXT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Page Size</label>
+                                <select class="form-select" id="pageSize">
+                                    <option value="a4">A4</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="legal">Legal</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="addPageNumbers">
+                                    <label class="form-check-label" for="addPageNumbers">
+                                        Add page numbers
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="addTableOfContents">
+                                    <label class="form-check-label" for="addTableOfContents">
+                                        Add table of contents
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="mergeBtn" disabled>
+                            <i class="fas fa-object-group me-2"></i>Merge Documents
+                        </button>
+                        <button class="btn btn-outline-secondary" id="clearBtn" disabled>
+                            <i class="fas fa-trash me-2"></i>Clear All
+                        </button>
+                    </div>
+
+                    <!-- Progress Bar (Hidden by default) -->
+                    <div class="progress mt-3" style="display: none;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">How to Use</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li>Upload your documents by dragging them or using the browse button</li>
+                                <li>Arrange the files in the desired order by dragging them</li>
+                                <li>Select the output format and adjust settings as needed</li>
+                                <li>Click "Merge Documents" to combine your files</li>
+                                <li>Download the merged document when processing is complete</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- PDF.js and Sortable.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Initialize variables
+        let files = [];
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const fileItems = document.getElementById('fileItems');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Initialize Sortable
+        new Sortable(fileItems, {
+            animation: 150,
+            handle: '.drag-handle',
+            onSort: updateFileOrder
+        });
+
+        // File input change handler
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(Array.from(e.dataTransfer.files));
+        });
+
+        // Clear button handler
+        clearBtn.addEventListener('click', () => {
+            files = [];
+            fileItems.innerHTML = '';
+            fileList.style.display = 'none';
+            mergeBtn.disabled = true;
+            clearBtn.disabled = true;
+            fileInput.value = '';
+        });
+
+        function handleFileSelect(e) {
+            handleFiles(Array.from(e.target.files));
+        }
+
+        function handleFiles(newFiles) {
+            const validFiles = newFiles.filter(file => {
+                const validTypes = ['.pdf', '.doc', '.docx', '.txt'];
+                return validTypes.some(type => file.name.toLowerCase().endsWith(type));
+            });
+
+            if (validFiles.length === 0) {
+                alert('Please select valid document files (PDF, DOC, DOCX, or TXT)');
+                return;
+            }
+
+            files = [...files, ...validFiles];
+            updateFileList();
+        }
+
+        function updateFileList() {
+            if (files.length > 0) {
+                fileList.style.display = 'block';
+                fileItems.innerHTML = files.map((file, index) => `
+                    <div class="file-item" data-index="${index}">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="file-info">
+                            <div>${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                mergeBtn.disabled = false;
+                clearBtn.disabled = false;
+            } else {
+                fileList.style.display = 'none';
+                mergeBtn.disabled = true;
+                clearBtn.disabled = true;
+            }
+        }
+
+        function removeFile(index) {
+            files.splice(index, 1);
+            updateFileList();
+        }
+
+        function updateFileOrder() {
+            const newFiles = [];
+            document.querySelectorAll('.file-item').forEach(item => {
+                const index = parseInt(item.dataset.index);
+                newFiles.push(files[index]);
+            });
+            files = newFiles;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Merge button handler
+        mergeBtn.addEventListener('click', async () => {
+            try {
+                // Show progress
+                const progress = document.querySelector('.progress');
+                progress.style.display = 'block';
+                
+                // TODO: Implement actual document merging logic here
+                // This would involve:
+                // 1. Reading each file
+                // 2. Converting to the selected output format
+                // 3. Merging the documents
+                // 4. Adding page numbers and table of contents if selected
+                // 5. Generating the final document
+                
+                // For now, just simulate progress
+                let width = 0;
+                const interval = setInterval(() => {
+                    width += 10;
+                    progress.querySelector('.progress-bar').style.width = width + '%';
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        progress.style.display = 'none';
+                        alert('Document merger functionality will be implemented soon!');
+                    }
+                }, 200);
+            } catch (error) {
+                alert('An error occurred while merging documents: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html> 

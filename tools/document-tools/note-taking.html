@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note-Taking App - Free Document Tools</title>
+    <meta name="description" content="Free online note-taking app. Create, organize, and save your notes with rich text formatting.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.snow.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .notes-container {
+            height: calc(100vh - 300px);
+            min-height: 500px;
+        }
+        .notes-sidebar {
+            border-right: 1px solid #dee2e6;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .note-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .note-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .note-item:hover {
+            background-color: #f8f9fa;
+        }
+        .note-item.active {
+            background-color: #e9ecef;
+            border-left: 3px solid #0d6efd;
+        }
+        .note-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .note-preview {
+            font-size: 0.85rem;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .note-date {
+            font-size: 0.75rem;
+            color: #adb5bd;
+        }
+        .note-editor {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        .ql-container {
+            font-size: 1rem;
+            height: calc(100% - 42px);
+        }
+        .ql-toolbar {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+        .note-title-input {
+            border: none;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 0;
+            padding: 10px 15px;
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+        .note-title-input:focus {
+            outline: none;
+            box-shadow: none;
+            border-color: #0d6efd;
+        }
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Note-Taking App</h1>
+                <p class="lead">Create, organize, and save your notes with rich text formatting</p>
+            </div>
+
+            <div class="tool-content">
+                <!-- Notes App Container -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">My Notes</h5>
+                        <div>
+                            <button id="new-note-btn" class="btn btn-primary btn-sm" aria-label="Create new note">
+                                <i class="fas fa-plus me-1"></i> New Note
+                            </button>
+                            <button id="export-notes-btn" class="btn btn-secondary btn-sm ms-2" aria-label="Export all notes">
+                                <i class="fas fa-download me-1"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="notes-container row g-0">
+                            <!-- Notes Sidebar -->
+                            <div class="col-md-4 col-lg-3 notes-sidebar">
+                                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                                    <span id="notes-count">0 Notes</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Sort notes">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                                            <li><a class="dropdown-item sort-option" data-sort="date-desc" href="#">Newest First</a></li>
+                                            <li><a class="dropdown-item sort-option" data-sort="date-asc" href="#">Oldest First</a></li>
+                                            <li><a class="dropdown-item sort-option" data-sort="title-asc" href="#">Title (A-Z)</a></li>
+                                            <li><a class="dropdown-item sort-option" data-sort="title-desc" href="#">Title (Z-A)</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="p-2">
+                                    <input type="text" id="search-notes" class="form-control form-control-sm" placeholder="Search notes...">
+                                </div>
+                                <ul id="note-list" class="note-list">
+                                    <!-- Notes will be listed here -->
+                                </ul>
+                            </div>
+                            
+                            <!-- Note Editor -->
+                            <div class="col-md-8 col-lg-9">
+                                <div id="empty-state" class="empty-state">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <h5>No Note Selected</h5>
+                                    <p>Create a new note or select an existing one</p>
+                                    <button id="empty-new-note-btn" class="btn btn-primary btn-sm" aria-label="Create new note from empty state">
+                                        <i class="fas fa-plus me-1"></i> Create New Note
+                                    </button>
+                                </div>
+                                <div id="note-editor" class="note-editor p-3" style="display: none;">
+                                    <input type="text" id="note-title" class="form-control note-title-input" placeholder="Note Title">
+                                    <div id="editor-container" class="editor-container"></div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span id="last-saved" class="text-muted small">Last saved: Never</span>
+                                        <div>
+                                            <button id="delete-note-btn" class="btn btn-danger btn-sm" aria-label="Delete current note">
+                                                <i class="fas fa-trash me-1"></i> Delete
+                                            </button>
+                                            <button id="save-note-btn" class="btn btn-primary btn-sm ms-2" aria-label="Save current note">
+                                                <i class="fas fa-save me-1"></i> Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">How to Use</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Click "New Note" to create a new note</li>
+                            <li>Enter a title for your note</li>
+                            <li>Use the rich text editor to format your content</li>
+                            <li>Click "Save" to save your note (notes are saved in your browser)</li>
+                            <li>Use the search box to find specific notes</li>
+                            <li>Click "Export" to download all your notes as a JSON file</li>
+                            <li>To delete a note, select it and click "Delete"</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Quill.js for rich text editing -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let notes = [];
+            let currentNoteId = null;
+            let currentSort = 'date-desc';
+            let quill;
+            
+            // DOM elements
+            const noteList = document.getElementById('note-list');
+            const notesCount = document.getElementById('notes-count');
+            const noteEditor = document.getElementById('note-editor');
+            const emptyState = document.getElementById('empty-state');
+            const noteTitleInput = document.getElementById('note-title');
+            const lastSavedSpan = document.getElementById('last-saved');
+            const searchInput = document.getElementById('search-notes');
+            
+            // Buttons
+            const newNoteBtn = document.getElementById('new-note-btn');
+            const emptyNewNoteBtn = document.getElementById('empty-new-note-btn');
+            const saveNoteBtn = document.getElementById('save-note-btn');
+            const deleteNoteBtn = document.getElementById('delete-note-btn');
+            const exportNotesBtn = document.getElementById('export-notes-btn');
+            const sortOptions = document.querySelectorAll('.sort-option');
+            
+            // Initialize Quill editor
+            quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Start writing your note here...'
+            });
+            
+            // Load notes from localStorage
+            function loadNotes() {
+                const savedNotes = localStorage.getItem('notes');
+                if (savedNotes) {
+                    notes = JSON.parse(savedNotes);
+                    renderNoteList();
+                }
+            }
+            
+            // Save notes to localStorage
+            function saveNotesToStorage() {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+            
+            // Render the note list
+            function renderNoteList(searchTerm = '') {
+                noteList.innerHTML = '';
+                
+                // Filter notes if search term exists
+                let filteredNotes = notes;
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    filteredNotes = notes.filter(note => 
+                        note.title.toLowerCase().includes(term) || 
+                        note.content.toLowerCase().includes(term)
+                    );
+                }
+                
+                // Sort notes
+                sortNotes(filteredNotes);
+                
+                // Update notes count
+                notesCount.textContent = `${filteredNotes.length} Note${filteredNotes.length !== 1 ? 's' : ''}`;
+                
+                // Create note items
+                if (filteredNotes.length === 0) {
+                    const emptyItem = document.createElement('li');
+                    emptyItem.className = 'note-item text-center text-muted';
+                    emptyItem.textContent = searchTerm ? 'No matching notes found' : 'No notes yet';
+                    noteList.appendChild(emptyItem);
+                } else {
+                    filteredNotes.forEach(note => {
+                        const noteItem = document.createElement('li');
+                        noteItem.className = `note-item ${note.id === currentNoteId ? 'active' : ''}`;
+                        noteItem.dataset.id = note.id;
+                        
+                        // Extract plain text from content for preview
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = note.content;
+                        const contentPreview = tempDiv.textContent.substring(0, 60) + (tempDiv.textContent.length > 60 ? '...' : '');
+                        
+                        noteItem.innerHTML = `
+                            <div class="note-title">${note.title || 'Untitled Note'}</div>
+                            <div class="note-preview">${contentPreview}</div>
+                            <div class="note-date">${formatDate(note.updatedAt)}</div>
+                        `;
+                        
+                        noteItem.addEventListener('click', () => selectNote(note.id));
+                        noteList.appendChild(noteItem);
+                    });
+                }
+            }
+            
+            // Sort notes based on current sort option
+            function sortNotes(notesToSort) {
+                switch (currentSort) {
+                    case 'date-desc':
+                        notesToSort.sort((a, b) => b.updatedAt - a.updatedAt);
+                        break;
+                    case 'date-asc':
+                        notesToSort.sort((a, b) => a.updatedAt - b.updatedAt);
+                        break;
+                    case 'title-asc':
+                        notesToSort.sort((a, b) => (a.title || 'Untitled').localeCompare(b.title || 'Untitled'));
+                        break;
+                    case 'title-desc':
+                        notesToSort.sort((a, b) => (b.title || 'Untitled').localeCompare(a.title || 'Untitled'));
+                        break;
+                }
+            }
+            
+            // Format date for display
+            function formatDate(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            // Create a new note
+            function createNewNote() {
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: '',
+                    content: '',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                
+                notes.unshift(newNote);
+                saveNotesToStorage();
+                renderNoteList();
+                selectNote(newNote.id);
+            }
+            
+            // Select a note
+            function selectNote(noteId) {
+                currentNoteId = noteId;
+                const note = notes.find(n => n.id === noteId);
+                
+                if (note) {
+                    // Show editor, hide empty state
+                    noteEditor.style.display = 'flex';
+                    emptyState.style.display = 'none';
+                    
+                    // Set note content
+                    noteTitleInput.value = note.title;
+                    quill.root.innerHTML = note.content;
+                    
+                    // Update last saved time
+                    lastSavedSpan.textContent = `Last saved: ${formatDate(note.updatedAt)}`;
+                    
+                    // Update active state in list
+                    document.querySelectorAll('.note-item').forEach(item => {
+                        item.classList.toggle('active', item.dataset.id === noteId);
+                    });
+                }
+            }
+            
+            // Save the current note
+            function saveCurrentNote() {
+                if (!currentNoteId) return;
+                
+                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                if (noteIndex !== -1) {
+                    const now = Date.now();
+                    
+                    // Update note
+                    notes[noteIndex].title = noteTitleInput.value;
+                    notes[noteIndex].content = quill.root.innerHTML;
+                    notes[noteIndex].updatedAt = now;
+                    
+                    // Save to storage
+                    saveNotesToStorage();
+                    
+                    // Update UI
+                    lastSavedSpan.textContent = `Last saved: ${formatDate(now)}`;
+                    renderNoteList(searchInput.value);
+                }
+            }
+            
+            // Delete the current note
+            function deleteCurrentNote() {
+                if (!currentNoteId) return;
+                
+                if (confirm('Are you sure you want to delete this note? This cannot be undone.')) {
+                    notes = notes.filter(n => n.id !== currentNoteId);
+                    saveNotesToStorage();
+                    
+                    // Clear editor and show empty state
+                    currentNoteId = null;
+                    noteEditor.style.display = 'none';
+                    emptyState.style.display = 'flex';
+                    
+                    // Update list
+                    renderNoteList(searchInput.value);
+                }
+            }
+            
+            // Export all notes
+            function exportNotes() {
+                if (notes.length === 0) {
+                    alert('You have no notes to export.');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(notes, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `notes-export-${new Date().toISOString().slice(0, 10)}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+            }
+            
+            // Event Listeners
+            newNoteBtn.addEventListener('click', createNewNote);
+            emptyNewNoteBtn.addEventListener('click', createNewNote);
+            saveNoteBtn.addEventListener('click', saveCurrentNote);
+            deleteNoteBtn.addEventListener('click', deleteCurrentNote);
+            exportNotesBtn.addEventListener('click', exportNotes);
+            
+            // Auto-save on input
+            noteTitleInput.addEventListener('input', debounce(saveCurrentNote, 1000));
+            quill.on('text-change', debounce(saveCurrentNote, 1000));
+            
+            // Search notes
+            searchInput.addEventListener('input', debounce(function() {
+                renderNoteList(this.value);
+            }, 300));
+            
+            // Sort options
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSort = this.dataset.sort;
+                    renderNoteList(searchInput.value);
+                });
+            });
+            
+            // Debounce function
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+            
+            // Initialize
+            loadNotes();
+        });
+    </script>
+</body>
+</html> 

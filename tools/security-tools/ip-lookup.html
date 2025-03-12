@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Address Lookup - Free Online Tools</title>
+    <meta name="description" content="Look up IP address information and geolocation with our free online tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">IP Address Lookup</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="ip-input" class="form-label">IP Address:</label>
+                            <div class="input-group">
+                                <input type="text" id="ip-input" class="form-control" 
+                                       placeholder="Enter IP address (e.g., 8.8.8.8)" 
+                                       aria-label="Enter IP address">
+                                <button id="lookup-btn" class="btn btn-primary" title="Look up IP address">
+                                    <i class="fas fa-search" aria-hidden="true"></i> Lookup
+                                </button>
+                                <button id="my-ip-btn" class="btn btn-secondary" title="Use my IP address">
+                                    <i class="fas fa-user" aria-hidden="true"></i> My IP
+                                </button>
+                            </div>
+                        </div>
+                        <div id="result-container" class="d-none">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">IP Information</h5>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>IP Address:</span>
+                                                    <strong id="ip-address"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Country:</span>
+                                                    <strong id="country"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Region:</span>
+                                                    <strong id="region"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>City:</span>
+                                                    <strong id="city"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>ZIP Code:</span>
+                                                    <strong id="zip"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Timezone:</span>
+                                                    <strong id="timezone"></strong>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>ISP:</span>
+                                                    <strong id="isp"></strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Location Map</h5>
+                                            <div id="map"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="error-container" class="alert alert-danger d-none" role="alert">
+                            <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                            <span id="error-message"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        let map = null;
+
+        // Initialize map
+        function initMap(lat, lon) {
+            if (map) {
+                map.remove();
+            }
+            map = L.map('map').setView([lat, lon], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([lat, lon]).addTo(map);
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('error-container').classList.remove('d-none');
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('result-container').classList.add('d-none');
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('error-container').classList.add('d-none');
+        }
+
+        // Update result display
+        function updateResult(data) {
+            document.getElementById('ip-address').textContent = data.ip;
+            document.getElementById('country').textContent = data.country_name;
+            document.getElementById('region').textContent = data.region;
+            document.getElementById('city').textContent = data.city;
+            document.getElementById('zip').textContent = data.zip || 'N/A';
+            document.getElementById('timezone').textContent = data.timezone;
+            document.getElementById('isp').textContent = data.org || 'N/A';
+            
+            document.getElementById('result-container').classList.remove('d-none');
+            initMap(data.latitude, data.longitude);
+        }
+
+        // Perform IP lookup
+        async function lookupIP(ip) {
+            try {
+                hideError();
+                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.reason || 'Invalid IP address');
+                }
+                
+                updateResult(data);
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('lookup-btn').addEventListener('click', () => {
+            const ip = document.getElementById('ip-input').value.trim();
+            if (ip) {
+                lookupIP(ip);
+            } else {
+                showError('Please enter an IP address');
+            }
+        });
+
+        document.getElementById('my-ip-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById('ip-input').value = data.ip;
+                lookupIP(data.ip);
+            } catch (error) {
+                showError('Failed to detect your IP address');
+            }
+        });
+
+        document.getElementById('ip-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('lookup-btn').click();
+            }
+        });
+    </script>
+</body>
+</html> 

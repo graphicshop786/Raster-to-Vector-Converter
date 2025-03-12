@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Poster Maker - Free Graphics Design Tools</title>
+    <meta name="description" content="Create stunning posters online with our free poster maker tool. Add text, images, shapes, and customize your design easily.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <!-- Fabric.js for canvas manipulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        .canvas-container {
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .tools-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .template-preview {
+            width: 100%;
+            height: 150px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .template-preview:hover {
+            transform: scale(1.05);
+            border-color: #0d6efd;
+        }
+        
+        .template-preview.active {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.25);
+        }
+        
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .shape-preset {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .shape-preset:hover {
+            transform: scale(1.1);
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container-fluid py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Online Poster Maker</h1>
+                <p class="lead">Create professional posters for any occasion</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="row">
+                    <div class="col-lg-9">
+                        <!-- Canvas Area -->
+                        <div class="canvas-wrapper bg-light p-3 rounded">
+                            <canvas id="canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <!-- Tools Panel -->
+                        <div class="tools-panel">
+                            <!-- Templates -->
+                            <div class="mb-4">
+                                <h5>Templates</h5>
+                                <div class="template-list">
+                                    <div class="template-preview" style="background-image: url('../../images/templates/poster1.jpg')" data-template="event" title="Event template"></div>
+                                    <div class="template-preview" style="background-image: url('../../images/templates/poster2.jpg')" data-template="business" title="Business template"></div>
+                                    <div class="template-preview" style="background-image: url('../../images/templates/poster3.jpg')" data-template="social" title="Social media template"></div>
+                                </div>
+                            </div>
+
+                            <!-- Add Text -->
+                            <div class="mb-4">
+                                <h5>Add Text</h5>
+                                <div class="mb-2">
+                                    <input type="text" id="text-input" class="form-control" placeholder="Enter text" title="Enter text">
+                                </div>
+                                <div class="mb-2">
+                                    <select id="font-family" class="form-select" title="Select font">
+                                        <option value="Arial">Arial</option>
+                                        <option value="Helvetica">Helvetica</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Georgia">Georgia</option>
+                                    </select>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input type="number" id="font-size" class="form-control" value="24" min="8" max="200" title="Font size">
+                                    <input type="color" id="text-color" class="color-picker" value="#000000" title="Text color">
+                                </div>
+                                <button id="add-text-btn" class="btn btn-primary w-100" title="Add text">
+                                    <i class="fas fa-plus me-2"></i>Add Text
+                                </button>
+                            </div>
+
+                            <!-- Add Image -->
+                            <div class="mb-4">
+                                <h5>Add Image</h5>
+                                <div class="mb-2">
+                                    <input type="file" id="image-input" class="form-control" accept="image/*" title="Upload image">
+                                </div>
+                                <button id="add-image-btn" class="btn btn-outline-primary w-100" title="Add image">
+                                    <i class="fas fa-image me-2"></i>Add Image
+                                </button>
+                            </div>
+
+                            <!-- Shapes -->
+                            <div class="mb-4">
+                                <h5>Add Shapes</h5>
+                                <div class="d-flex flex-wrap">
+                                    <div class="shape-preset" data-shape="rect" title="Rectangle">
+                                        <i class="fas fa-square"></i>
+                                    </div>
+                                    <div class="shape-preset" data-shape="circle" title="Circle">
+                                        <i class="fas fa-circle"></i>
+                                    </div>
+                                    <div class="shape-preset" data-shape="triangle" title="Triangle">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                    <div class="shape-preset" data-shape="line" title="Line">
+                                        <i class="fas fa-minus"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="color" id="shape-color" class="color-picker w-100" value="#000000" title="Shape color">
+                                </div>
+                            </div>
+
+                            <!-- Background -->
+                            <div class="mb-4">
+                                <h5>Background</h5>
+                                <div class="input-group">
+                                    <input type="color" id="bg-color" class="color-picker" value="#ffffff" title="Background color">
+                                    <input type="file" id="bg-image" class="form-control" accept="image/*" title="Background image">
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="mb-4">
+                                <h5>Actions</h5>
+                                <div class="btn-group w-100 mb-2">
+                                    <button id="bring-forward" class="btn btn-outline-secondary" title="Bring forward">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                    <button id="send-backward" class="btn btn-outline-secondary" title="Send backward">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                    <button id="delete-selected" class="btn btn-outline-danger" title="Delete selected">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <button id="undo-btn" class="btn btn-outline-secondary" title="Undo">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                    <button id="redo-btn" class="btn btn-outline-secondary" title="Redo">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Download -->
+                            <div>
+                                <button id="download-btn" class="btn btn-primary w-100" title="Download poster">
+                                    <i class="fas fa-download me-2"></i>Download Poster
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div class="loading">
+        <div class="spinner-border text-primary spinner" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize canvas
+            const canvas = new fabric.Canvas('canvas', {
+                width: 800,
+                height: 600,
+                backgroundColor: '#ffffff'
+            });
+            
+            // History for undo/redo
+            let history = [];
+            let historyIndex = -1;
+            
+            // Save state
+            function saveState() {
+                const json = JSON.stringify(canvas.toJSON());
+                historyIndex++;
+                history = history.slice(0, historyIndex);
+                history.push(json);
+                updateUndoRedo();
+            }
+            
+            // Update undo/redo buttons
+            function updateUndoRedo() {
+                document.getElementById('undo-btn').disabled = historyIndex <= 0;
+                document.getElementById('redo-btn').disabled = historyIndex >= history.length - 1;
+            }
+            
+            // Add text
+            document.getElementById('add-text-btn').addEventListener('click', function() {
+                const text = document.getElementById('text-input').value;
+                if (!text) return;
+                
+                const textObj = new fabric.Text(text, {
+                    left: 100,
+                    top: 100,
+                    fontFamily: document.getElementById('font-family').value,
+                    fontSize: parseInt(document.getElementById('font-size').value),
+                    fill: document.getElementById('text-color').value
+                });
+                
+                canvas.add(textObj);
+                canvas.setActiveObject(textObj);
+                saveState();
+            });
+            
+            // Add image
+            document.getElementById('add-image-btn').addEventListener('click', function() {
+                const input = document.getElementById('image-input');
+                if (!input.files[0]) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fabric.Image.fromURL(e.target.result, function(img) {
+                        // Scale image to fit canvas
+                        const scale = Math.min(
+                            (canvas.width * 0.8) / img.width,
+                            (canvas.height * 0.8) / img.height
+                        );
+                        
+                        img.scale(scale);
+                        canvas.add(img);
+                        canvas.setActiveObject(img);
+                        saveState();
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
+            });
+            
+            // Add shapes
+            document.querySelectorAll('.shape-preset').forEach(preset => {
+                preset.addEventListener('click', function() {
+                    const shape = this.dataset.shape;
+                    const color = document.getElementById('shape-color').value;
+                    
+                    let obj;
+                    switch(shape) {
+                        case 'rect':
+                            obj = new fabric.Rect({
+                                left: 100,
+                                top: 100,
+                                width: 100,
+                                height: 100,
+                                fill: color
+                            });
+                            break;
+                        case 'circle':
+                            obj = new fabric.Circle({
+                                left: 100,
+                                top: 100,
+                                radius: 50,
+                                fill: color
+                            });
+                            break;
+                        case 'triangle':
+                            obj = new fabric.Triangle({
+                                left: 100,
+                                top: 100,
+                                width: 100,
+                                height: 100,
+                                fill: color
+                            });
+                            break;
+                        case 'line':
+                            obj = new fabric.Line([50, 100, 200, 100], {
+                                left: 100,
+                                top: 100,
+                                stroke: color
+                            });
+                            break;
+                    }
+                    
+                    if (obj) {
+                        canvas.add(obj);
+                        canvas.setActiveObject(obj);
+                        saveState();
+                    }
+                });
+            });
+            
+            // Background color
+            document.getElementById('bg-color').addEventListener('input', function() {
+                canvas.backgroundColor = this.value;
+                canvas.renderAll();
+            });
+            
+            // Background image
+            document.getElementById('bg-image').addEventListener('change', function() {
+                if (!this.files[0]) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fabric.Image.fromURL(e.target.result, function(img) {
+                        img.set({
+                            width: canvas.width,
+                            height: canvas.height,
+                            selectable: false,
+                            evented: false
+                        });
+                        
+                        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                        saveState();
+                    });
+                };
+                reader.readAsDataURL(this.files[0]);
+            });
+            
+            // Layer controls
+            document.getElementById('bring-forward').addEventListener('click', function() {
+                const obj = canvas.getActiveObject();
+                if (obj) {
+                    canvas.bringForward(obj);
+                    saveState();
+                }
+            });
+            
+            document.getElementById('send-backward').addEventListener('click', function() {
+                const obj = canvas.getActiveObject();
+                if (obj) {
+                    canvas.sendBackwards(obj);
+                    saveState();
+                }
+            });
+            
+            // Delete selected
+            document.getElementById('delete-selected').addEventListener('click', function() {
+                const obj = canvas.getActiveObject();
+                if (obj) {
+                    canvas.remove(obj);
+                    saveState();
+                }
+            });
+            
+            // Undo
+            document.getElementById('undo-btn').addEventListener('click', function() {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    canvas.loadFromJSON(history[historyIndex], canvas.renderAll.bind(canvas));
+                    updateUndoRedo();
+                }
+            });
+            
+            // Redo
+            document.getElementById('redo-btn').addEventListener('click', function() {
+                if (historyIndex < history.length - 1) {
+                    historyIndex++;
+                    canvas.loadFromJSON(history[historyIndex], canvas.renderAll.bind(canvas));
+                    updateUndoRedo();
+                }
+            });
+            
+            // Download
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const link = document.createElement('a');
+                link.download = 'poster.png';
+                link.href = canvas.toDataURL({
+                    format: 'png',
+                    quality: 0.8
+                });
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+            
+            // Save initial state
+            saveState();
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 'z':
+                            if (e.shiftKey) {
+                                document.getElementById('redo-btn').click();
+                            } else {
+                                document.getElementById('undo-btn').click();
+                            }
+                            e.preventDefault();
+                            break;
+                        case 'y':
+                            document.getElementById('redo-btn').click();
+                            e.preventDefault();
+                            break;
+                    }
+                }
+                
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    const obj = canvas.getActiveObject();
+                    if (obj && document.activeElement.tagName !== 'INPUT') {
+                        canvas.remove(obj);
+                        saveState();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

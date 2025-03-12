@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Headers Checker - Free Online Tools</title>
+    <meta name="description" content="Check HTTP response headers, security headers, and analyze website security configuration with our free HTTP Headers Checker tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .header-data {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .header-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+        .security-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .score-a {
+            color: #198754;
+        }
+        .score-b {
+            color: #0dcaf0;
+        }
+        .score-c {
+            color: #ffc107;
+        }
+        .score-d, .score-f {
+            color: #dc3545;
+        }
+        .missing-header {
+            color: #dc3545;
+        }
+        .present-header {
+            color: #198754;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">HTTP Headers Checker</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Headers Checker Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="urlInput" class="form-label">Enter Website URL:</label>
+                            <div class="input-group">
+                                <input type="url" id="urlInput" class="form-control" placeholder="https://example.com" required>
+                                <button class="btn btn-primary" onclick="checkHeaders()" aria-label="Check Headers">
+                                    <i class="fas fa-search"></i> Check
+                                </button>
+                            </div>
+                            <small class="text-muted">Enter a complete URL including http:// or https://</small>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div id="headerResults" style="display: none;">
+                            <!-- Security Score -->
+                            <div class="text-center mb-4">
+                                <h5>Security Score</h5>
+                                <div id="securityScore" class="security-score"></div>
+                                <div id="scoreMessage" class="mt-2"></div>
+                            </div>
+
+                            <!-- Security Headers -->
+                            <div class="mb-4">
+                                <h5>Security Headers Analysis</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered header-data">
+                                        <thead>
+                                            <tr>
+                                                <th>Header</th>
+                                                <th>Status</th>
+                                                <th>Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="securityHeadersTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- All Headers -->
+                            <div>
+                                <h5>All Response Headers</h5>
+                                <div class="position-relative">
+                                    <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0" onclick="copyHeaders()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                    <pre id="allHeaders" class="header-data bg-light p-3 rounded mt-2"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check History -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Checks</h5>
+                        <div class="header-history list-group" id="headerHistory"></div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About HTTP Headers Checker</h5>
+                        <p>Our HTTP Headers Checker analyzes website security configuration through HTTP response headers:</p>
+                        <ul class="mb-0">
+                            <li>Security headers analysis</li>
+                            <li>Missing security headers detection</li>
+                            <li>Security score calculation</li>
+                            <li>Best practices recommendations</li>
+                            <li>Complete headers inspection</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> Regular security header checks help maintain website security and prevent common vulnerabilities.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+        
+    <script>
+        // Important security headers to check
+        const SECURITY_HEADERS = {
+            'Strict-Transport-Security': {
+                description: 'Forces HTTPS connections',
+                recommended: 'max-age=31536000; includeSubDomains'
+            },
+            'Content-Security-Policy': {
+                description: 'Controls resources the browser is allowed to load',
+                recommended: 'Customized per site needs'
+            },
+            'X-Frame-Options': {
+                description: 'Prevents clickjacking attacks',
+                recommended: 'SAMEORIGIN'
+            },
+            'X-Content-Type-Options': {
+                description: 'Prevents MIME-type sniffing',
+                recommended: 'nosniff'
+            },
+            'X-XSS-Protection': {
+                description: 'Enables browser XSS filtering',
+                recommended: '1; mode=block'
+            },
+            'Referrer-Policy': {
+                description: 'Controls referrer information',
+                recommended: 'strict-origin-when-cross-origin'
+            },
+            'Permissions-Policy': {
+                description: 'Controls browser features',
+                recommended: 'Customized per site needs'
+            }
+        };
+
+        // Check history
+        let headerHistory = [];
+        const MAX_HISTORY = 5;
+
+        // Check headers
+        async function checkHeaders() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('Please enter a valid URL');
+                return;
+            }
+
+            try {
+                // Using a proxy service to avoid CORS issues
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if (data.headers) {
+                    const headers = data.headers;
+                    updateResults(headers);
+                    addToHistory(url, calculateSecurityScore(headers));
+                } else {
+                    alert('Could not fetch headers for this URL.');
+                }
+            } catch (error) {
+                alert('Error checking headers. Please try again.');
+            }
+        }
+
+        // Calculate security score
+        function calculateSecurityScore(headers) {
+            let score = 100;
+            let missingHeaders = 0;
+            
+            for (const header in SECURITY_HEADERS) {
+                if (!headers[header]) {
+                    score -= 10;
+                    missingHeaders++;
+                }
+            }
+
+            let grade = 'A';
+            if (score < 90) grade = 'B';
+            if (score < 80) grade = 'C';
+            if (score < 70) grade = 'D';
+            if (score < 60) grade = 'F';
+
+            return {
+                score: score,
+                grade: grade,
+                missingHeaders: missingHeaders
+            };
+        }
+
+        // Update results display
+        function updateResults(headers) {
+            document.getElementById('headerResults').style.display = 'block';
+            
+            // Calculate and display security score
+            const securityResult = calculateSecurityScore(headers);
+            const scoreElement = document.getElementById('securityScore');
+            scoreElement.textContent = `${securityResult.grade} (${securityResult.score}%)`;
+            scoreElement.className = `security-score score-${securityResult.grade.toLowerCase()}`;
+
+            // Display score message
+            const messageElement = document.getElementById('scoreMessage');
+            if (securityResult.missingHeaders > 0) {
+                messageElement.innerHTML = `<div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Missing ${securityResult.missingHeaders} important security headers
+                </div>`;
+            } else {
+                messageElement.innerHTML = `<div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> 
+                    All important security headers are present
+                </div>`;
+            }
+
+            // Display security headers analysis
+            const tableBody = document.getElementById('securityHeadersTable');
+            tableBody.innerHTML = '';
+            
+            for (const [header, info] of Object.entries(SECURITY_HEADERS)) {
+                const row = document.createElement('tr');
+                const value = headers[header];
+                row.innerHTML = `
+                    <td>${header}</td>
+                    <td>
+                        ${value ? 
+                            '<i class="fas fa-check present-header"></i> Present' : 
+                            '<i class="fas fa-times missing-header"></i> Missing'}
+                    </td>
+                    <td>${value || '<span class="text-muted">Not set</span>'}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+
+            // Display all headers
+            const allHeadersElement = document.getElementById('allHeaders');
+            allHeadersElement.textContent = Object.entries(headers)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+        }
+
+        // Copy headers to clipboard
+        function copyHeaders() {
+            const headerData = document.getElementById('allHeaders').textContent;
+            navigator.clipboard.writeText(headerData).then(() => {
+                alert('Headers copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy headers: ' + err);
+            });
+        }
+
+        // Add to history
+        function addToHistory(url, securityResult) {
+            headerHistory.unshift({
+                url: url,
+                timestamp: new Date(),
+                grade: securityResult.grade,
+                score: securityResult.score
+            });
+            if (headerHistory.length > MAX_HISTORY) {
+                headerHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('headerHistory');
+            historyContainer.innerHTML = '';
+            
+            headerHistory.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'list-group-item history-item';
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.url}</strong>
+                            <br>
+                            <small class="text-muted">${item.timestamp.toLocaleString()}</small>
+                        </div>
+                        <span class="score-${item.grade.toLowerCase()}">${item.grade} (${item.score}%)</span>
+                    </div>
+                `;
+                element.onclick = () => {
+                    document.getElementById('urlInput').value = item.url;
+                    checkHeaders();
+                };
+                historyContainer.appendChild(element);
+            });
+        }
+    </script>
+</body>
+</html> 

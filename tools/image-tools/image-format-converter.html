@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Format Converter - Convert Images Between Formats</title>
+    <meta name="description" content="Free online tool to convert images between different formats (JPG, PNG, WebP). Upload your image and choose the desired output format.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">       
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Image Format Converter</h1>
+                <p class="lead">Convert images between different formats</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="image-input" class="form-label">Upload Image:</label>
+                        <input type="file" class="form-control" id="image-input" accept="image/*">
+                        <div class="form-text">Supported input formats: JPG, PNG, GIF, WebP</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Original Image</h5>
+                                <div class="image-preview-container">
+                                    <img id="original-preview" class="img-fluid" style="display: none;">
+                                </div>
+                                <div id="original-info" class="card mt-2">
+                                    <div class="card-body">
+                                        <p class="mb-1">Size: <span id="original-size">-</span></p>
+                                        <p class="mb-1">Format: <span id="original-format">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Converted Image</h5>
+                                <div class="image-preview-container">
+                                    <img id="converted-preview" class="img-fluid" style="display: none;">
+                                </div>
+                                <div id="converted-info" class="card mt-2">
+                                    <div class="card-body">
+                                        <p class="mb-1">Size: <span id="converted-size">-</span></p>
+                                        <p class="mb-1">Format: <span id="converted-format">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="format-select" class="form-label">Convert to:</label>
+                        <select class="form-select" id="format-select">
+                            <option value="jpeg">JPEG</option>
+                            <option value="png">PNG</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quality" class="form-label">Quality (for JPEG/WebP):</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range me-3" id="quality" min="0" max="100" value="90">
+                            <span id="quality-value">90</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="convertImage()">
+                            <i class="fas fa-exchange-alt me-2"></i>Convert
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadImage()" id="download-btn" style="display: none;">
+                            <i class="fas fa-download me-2"></i>Download
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearImage()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Image Format Conversion</h3>
+                    <p>Different image formats have different strengths:</p>
+                    <ul>
+                        <li><strong>JPEG:</strong> Best for photographs, supports compression</li>
+                        <li><strong>PNG:</strong> Best for graphics with transparency</li>
+                        <li><strong>WebP:</strong> Modern format with better compression</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Note: Converting to a lossy format (JPEG/WebP) may reduce image quality. Adjust the quality slider to find the right balance.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Image Format Converter Tool JavaScript
+        let originalImage = null;
+        let originalFile = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('image-input');
+            const qualitySlider = document.getElementById('quality');
+            const qualityValue = document.getElementById('quality-value');
+
+            // Handle image upload
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    originalFile = file;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        originalImage = new Image();
+                        originalImage.onload = function() {
+                            document.getElementById('original-preview').src = e.target.result;
+                            document.getElementById('original-preview').style.display = 'block';
+                            document.getElementById('original-size').textContent = formatFileSize(file.size);
+                            document.getElementById('original-format').textContent = file.type.split('/')[1].toUpperCase();
+                            document.getElementById('download-btn').style.display = 'none';
+                        };
+                        originalImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Update quality value display
+            qualitySlider.addEventListener('input', function() {
+                qualityValue.textContent = this.value;
+            });
+        });
+
+        function convertImage() {
+            if (!originalImage) {
+                alert('Please upload an image first');
+                return;
+            }
+
+            const format = document.getElementById('format-select').value;
+            const quality = document.getElementById('quality').value / 100;
+            const canvas = document.createElement('canvas');
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            const ctx = canvas.getContext('2d');
+
+            // Draw image
+            ctx.drawImage(originalImage, 0, 0);
+
+            // Convert to selected format
+            let mimeType;
+            switch(format) {
+                case 'jpeg':
+                    mimeType = 'image/jpeg';
+                    break;
+                case 'png':
+                    mimeType = 'image/png';
+                    break;
+                case 'webp':
+                    mimeType = 'image/webp';
+                    break;
+            }
+
+            // Get converted image data
+            const convertedDataUrl = canvas.toDataURL(mimeType, quality);
+            
+            // Display converted image
+            const convertedPreview = document.getElementById('converted-preview');
+            convertedPreview.src = convertedDataUrl;
+            convertedPreview.style.display = 'block';
+            
+            // Update converted image information
+            document.getElementById('converted-format').textContent = format.toUpperCase();
+            
+            // Calculate converted size
+            const base64Size = Math.round((convertedDataUrl.length - 22) * 3 / 4);
+            document.getElementById('converted-size').textContent = formatFileSize(base64Size);
+            
+            // Show download button
+            document.getElementById('download-btn').style.display = 'block';
+        }
+
+        function downloadImage() {
+            const convertedPreview = document.getElementById('converted-preview');
+            if (convertedPreview.src) {
+                const format = document.getElementById('format-select').value;
+                const link = document.createElement('a');
+                link.download = `converted-image.${format}`;
+                link.href = convertedPreview.src;
+                link.click();
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function clearImage() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('original-preview').style.display = 'none';
+            document.getElementById('converted-preview').style.display = 'none';
+            document.getElementById('original-size').textContent = '-';
+            document.getElementById('original-format').textContent = '-';
+            document.getElementById('converted-size').textContent = '-';
+            document.getElementById('converted-format').textContent = '-';
+            document.getElementById('download-btn').style.display = 'none';
+            originalImage = null;
+            originalFile = null;
+        }
+    </script>
+</body>
+</html> 

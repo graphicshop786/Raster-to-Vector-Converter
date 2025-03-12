@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Splitter - Free Document Tools</title>
+    <meta name="description" content="Split PDF and other document files into multiple parts with our free online document splitter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .drop-zone.dragover {
+            border-color: #0d6efd;
+            background: #e9ecef;
+        }
+        .preview-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background: white;
+        }
+        .file-item i {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        .file-item .file-info {
+            flex-grow: 1;
+        }
+        .file-item .file-actions {
+            margin-left: 1rem;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .split-preview {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .page-range {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .page-range input {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Document Splitter</h1>
+                <p class="lead">Split documents into multiple parts</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- File Upload Area -->
+                    <div class="drop-zone mb-4" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                        <h3 class="h5">Drag & Drop File Here</h3>
+                        <p class="text-muted mb-3">or</p>
+                        <button class="btn btn-primary" id="browseBtn">
+                            <i class="fas fa-folder-open me-2"></i>Browse File
+                        </button>
+                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display: none;">
+                        <p class="text-muted mt-3">
+                            Supported formats: PDF, DOC, DOCX
+                        </p>
+                    </div>
+
+                    <!-- Split Settings -->
+                    <div class="settings-panel mb-4">
+                        <h3 class="h5 mb-3">Split Settings</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Split Method</label>
+                                <select class="form-select" id="splitMethod">
+                                    <option value="range">By Page Range</option>
+                                    <option value="number">By Number of Pages</option>
+                                    <option value="size">By File Size</option>
+                                </select>
+                            </div>
+                            <div class="col-12" id="rangeSettings">
+                                <div id="pageRanges">
+                                    <div class="page-range">
+                                        <span>Part 1:</span>
+                                        <input type="number" class="form-control" min="1" placeholder="From">
+                                        <span>to</span>
+                                        <input type="number" class="form-control" min="1" placeholder="To">
+                                        <button class="btn btn-outline-danger" onclick="this.parentElement.remove()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary mt-2" id="addRangeBtn">
+                                    <i class="fas fa-plus me-2"></i>Add Range
+                                </button>
+                            </div>
+                            <div class="col-md-6" id="numberSettings" style="display: none;">
+                                <label class="form-label">Pages per Part</label>
+                                <input type="number" class="form-control" id="pagesPerPart" min="1" value="1">
+                            </div>
+                            <div class="col-md-6" id="sizeSettings" style="display: none;">
+                                <label class="form-label">Maximum Size per Part (MB)</label>
+                                <input type="number" class="form-control" id="maxSize" min="1" value="10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Preview -->
+                    <div class="preview-container mb-4" id="previewContainer" style="display: none;">
+                        <h3 class="h5 mb-3">Selected File</h3>
+                        <div id="fileList"></div>
+                        <div class="split-preview mt-3" id="splitPreview">
+                            <h4 class="h6 mb-3">Split Preview</h4>
+                            <div id="previewList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="splitBtn" disabled>
+                            <i class="fas fa-cut me-2"></i>Split Document
+                        </button>
+                        <button class="btn btn-outline-secondary" id="clearBtn" disabled>
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">How to Use</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li>Upload your document (PDF, DOC, or DOCX)</li>
+                                <li>Choose your preferred split method:
+                                    <ul>
+                                        <li>By Page Range - Specify exact pages for each part</li>
+                                        <li>By Number of Pages - Split into parts with equal pages</li>
+                                        <li>By File Size - Split based on maximum file size</li>
+                                    </ul>
+                                </li>
+                                <li>Configure split settings</li>
+                                <li>Preview the split parts</li>
+                                <li>Click "Split Document" to process</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- PDF.js for PDF handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="/js/document-tools/document-splitter.js"></script>
+</body>
+</html> 

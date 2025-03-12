@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random String Generator - Free Online Tools</title>
+    <meta name="description" content="Generate random strings with customizable options for length and character types. Perfect for creating unique identifiers, tokens, and test data.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .string-output {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .string-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .preset-btn {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Random String Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Generator Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="stringOutput" class="form-label">Generated String:</label>
+                            <div class="input-group">
+                                <input type="text" id="stringOutput" class="form-control string-output" readonly aria-label="Generated string">
+                                <button class="btn btn-primary" onclick="copyString()" aria-label="Copy string">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="length" class="form-label">String Length: <span id="lengthValue">16</span></label>
+                            <input type="range" class="form-range" id="length" min="1" max="128" value="16" aria-label="String length slider">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Character Types:</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="uppercase" checked aria-label="Include uppercase letters">
+                                <label class="form-check-label" for="uppercase">
+                                    Uppercase Letters (A-Z)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="lowercase" checked aria-label="Include lowercase letters">
+                                <label class="form-check-label" for="lowercase">
+                                    Lowercase Letters (a-z)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="numbers" checked aria-label="Include numbers">
+                                <label class="form-check-label" for="numbers">
+                                    Numbers (0-9)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="symbols" aria-label="Include special characters">
+                                <label class="form-check-label" for="symbols">
+                                    Special Characters (!@#$%^&*)
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="excludeAmbiguous" aria-label="Exclude ambiguous characters">
+                                <label class="form-check-label" for="excludeAmbiguous">
+                                    Exclude Ambiguous Characters (l, I, 1, O, 0)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quick Presets:</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-outline-primary preset-btn" onclick="usePreset('uuid')" aria-label="Generate UUID">
+                                    UUID
+                                </button>
+                                <button class="btn btn-outline-primary preset-btn" onclick="usePreset('hex')" aria-label="Generate HEX">
+                                    HEX
+                                </button>
+                                <button class="btn btn-outline-primary preset-btn" onclick="usePreset('base64')" aria-label="Generate Base64">
+                                    Base64
+                                </button>
+                                <button class="btn btn-outline-primary preset-btn" onclick="usePreset('alphanumeric')" aria-label="Generate Alphanumeric">
+                                    Alphanumeric
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success w-100" onclick="generateString()" aria-label="Generate new string">
+                            <i class="fas fa-sync-alt"></i> Generate New String
+                        </button>
+                    </div>
+                </div>
+
+                <!-- String History -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Strings</h5>
+                        <div class="string-history list-group" id="stringHistory"></div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">String Types Information</h5>
+                        <div class="accordion" id="stringTypesAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uuidInfo">
+                                        UUID
+                                    </button>
+                                </h2>
+                                <div id="uuidInfo" class="accordion-collapse collapse" data-bs-parent="#stringTypesAccordion">
+                                    <div class="accordion-body">
+                                        A 36-character string in the format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx, where x is any hexadecimal digit and y is one of 8, 9, A, or B.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hexInfo">
+                                        HEX
+                                    </button>
+                                </h2>
+                                <div id="hexInfo" class="accordion-collapse collapse" data-bs-parent="#stringTypesAccordion">
+                                    <div class="accordion-body">
+                                        A string containing only hexadecimal characters (0-9, A-F). Commonly used for color codes and binary data representation.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#base64Info">
+                                        Base64
+                                    </button>
+                                </h2>
+                                <div id="base64Info" class="accordion-collapse collapse" data-bs-parent="#stringTypesAccordion">
+                                    <div class="accordion-body">
+                                        A string encoded in Base64 format, using characters A-Z, a-z, 0-9, +, and /. Often used for encoding binary data.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#alphanumericInfo">
+                                        Alphanumeric
+                                    </button>
+                                </h2>
+                                <div id="alphanumericInfo" class="accordion-collapse collapse" data-bs-parent="#stringTypesAccordion">
+                                    <div class="accordion-body">
+                                        A string containing only letters and numbers, ideal for generating readable identifiers or codes.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Character sets
+        const CHARS = {
+            uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            lowercase: 'abcdefghijklmnopqrstuvwxyz',
+            numbers: '0123456789',
+            symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
+            hex: '0123456789ABCDEF',
+            base64: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+        };
+        const AMBIGUOUS_CHARS = 'Il1O0';
+
+        // String history
+        let stringHistory = [];
+        const MAX_HISTORY = 5;
+
+        // Generate UUID v4
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Generate random string
+        function generateString() {
+            const preset = document.querySelector('.preset-btn.active')?.textContent.toLowerCase();
+            
+            if (preset) {
+                let result = '';
+                switch(preset) {
+                    case 'uuid':
+                        result = generateUUID();
+                        break;
+                    case 'hex':
+                        result = Array(document.getElementById('length').value)
+                            .fill()
+                            .map(() => CHARS.hex[Math.floor(Math.random() * CHARS.hex.length)])
+                            .join('');
+                        break;
+                    case 'base64':
+                        result = Array(document.getElementById('length').value)
+                            .fill()
+                            .map(() => CHARS.base64[Math.floor(Math.random() * CHARS.base64.length)])
+                            .join('');
+                        break;
+                    case 'alphanumeric':
+                        const alphanumeric = CHARS.uppercase + CHARS.lowercase + CHARS.numbers;
+                        result = Array(document.getElementById('length').value)
+                            .fill()
+                            .map(() => alphanumeric[Math.floor(Math.random() * alphanumeric.length)])
+                            .join('');
+                        break;
+                }
+                document.getElementById('stringOutput').value = result;
+                addToHistory(result, preset.toUpperCase());
+                return;
+            }
+
+            let charset = '';
+            const length = parseInt(document.getElementById('length').value);
+            const useUppercase = document.getElementById('uppercase').checked;
+            const useLowercase = document.getElementById('lowercase').checked;
+            const useNumbers = document.getElementById('numbers').checked;
+            const useSymbols = document.getElementById('symbols').checked;
+            const excludeAmbiguous = document.getElementById('excludeAmbiguous').checked;
+
+            if (useUppercase) charset += CHARS.uppercase;
+            if (useLowercase) charset += CHARS.lowercase;
+            if (useNumbers) charset += CHARS.numbers;
+            if (useSymbols) charset += CHARS.symbols;
+
+            if (!charset) {
+                alert('Please select at least one character type');
+                return;
+            }
+
+            if (excludeAmbiguous) {
+                charset = charset.split('').filter(char => !AMBIGUOUS_CHARS.includes(char)).join('');
+            }
+
+            const result = Array(length)
+                .fill()
+                .map(() => charset[Math.floor(Math.random() * charset.length)])
+                .join('');
+
+            document.getElementById('stringOutput').value = result;
+            addToHistory(result, 'Custom');
+        }
+
+        // Use preset
+        function usePreset(type) {
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="usePreset('${type}')"]`).classList.add('active');
+            generateString();
+        }
+
+        // Add to history
+        function addToHistory(string, type) {
+            stringHistory.unshift({ string, type, timestamp: new Date() });
+            if (stringHistory.length > MAX_HISTORY) {
+                stringHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('stringHistory');
+            historyContainer.innerHTML = '';
+            
+            stringHistory.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'list-group-item history-item';
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${item.type}</small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('${item.string}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="mt-1">${item.string}</div>
+                `;
+                historyContainer.appendChild(element);
+            });
+        }
+
+        // Copy string
+        function copyString() {
+            const output = document.getElementById('stringOutput');
+            if (!output.value) return;
+
+            navigator.clipboard.writeText(output.value).then(() => {
+                alert('String copied to clipboard!');
+            });
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('String copied to clipboard!');
+            });
+        }
+
+        // Update length display
+        document.getElementById('length').addEventListener('input', function() {
+            document.getElementById('lengthValue').textContent = this.value;
+            if (!document.querySelector('.preset-btn.active')) {
+                generateString();
+            }
+        });
+
+        // Generate initial string
+        generateString();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - AI Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-color: #1000BF;
+            --secondary-color: #0A0080;
+            --accent-color: #4B44F2;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .custom-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: none;
+            overflow: hidden;
+        }
+
+        .custom-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-control {
+            border: 2px solid #e1e5f2;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(16, 0, 191, 0.15);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 0, 191, 0.3);
+        }
+
+        .contact-info {
+            background: rgba(16, 0, 191, 0.03);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .contact-info h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info h4 {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-info i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(16, 0, 191, 0.1);
+        }
+
+        .ad-space {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px dashed #e1e5f2;
+        }
+
+        .ad-space p {
+            color: #666;
+            margin: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .alert {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        #loadingSpinner {
+            display: none;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Top Ad Space -->
+    <div class="container mt-4">
+        <div class="ad-space">
+            <p>Advertisement Space</p>
+        </div>
+    </div>
+
+    <!-- Contact Form Section -->
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="page-title">Contact Us</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Success/Error Messages -->
+                <div class="alert alert-success" id="successAlert" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="successMessage"></span>
+                </div>
+                <div class="alert alert-danger" id="errorAlert" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+
+                <div class="custom-card animate-fadeInUp">
+                    <div class="card-body p-4">
+                        <form id="contactForm" action="https://formspree.io/f/graphicshop786@gmail.com" method="POST" novalidate>
+                            <input type="hidden" name="_subject" value="New Contact Form Submission">
+                            <input type="hidden" name="_template" value="table">
+                            <input type="hidden" name="_next" value="https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME/thank-you.html">
+                            
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required 
+                                       placeholder="Enter your full name" minlength="2">
+                                <div class="invalid-feedback">
+                                    Please enter your full name (minimum 2 characters)
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="_replyto" required 
+                                       placeholder="Enter your email address">
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="subject" name="subject" required 
+                                       placeholder="Enter message subject" minlength="3">
+                                <div class="invalid-feedback">
+                                    Please enter a subject (minimum 3 characters)
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required 
+                                          placeholder="Type your message here..." minlength="10"></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter your message (minimum 10 characters)
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitButton">
+                                    <span id="loadingSpinner" role="status" aria-hidden="true">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                    <i class="fas fa-paper-plane me-2" id="submitIcon"></i>
+                                    <span id="submitText">Send Message</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="custom-card mt-4 animate-fadeInUp">
+                    <div class="card-body p-4">
+                        <div class="contact-info">
+                            <h3>Other Ways to Reach Us</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h4><i class="fas fa-envelope"></i> Email</h4>
+                                    <p>graphicshop786@gmail.com</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h4><i class="fas fa-phone"></i> Phone</h4>
+                                    <p>+923401617879</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Ad Space -->
+    <div class="container mb-4">
+        <div class="ad-space">
+            <p>Advertisement Space</p>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contactForm');
+            const submitButton = document.getElementById('submitButton');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const submitIcon = document.getElementById('submitIcon');
+            const submitText = document.getElementById('submitText');
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+
+            function showLoading() {
+                submitButton.disabled = true;
+                loadingSpinner.style.display = 'inline-block';
+                submitIcon.style.display = 'none';
+                submitText.textContent = 'Sending...';
+            }
+
+            function hideLoading() {
+                submitButton.disabled = false;
+                loadingSpinner.style.display = 'none';
+                submitIcon.style.display = 'inline-block';
+                submitText.textContent = 'Send Message';
+            }
+
+            function validateForm() {
+                const name = document.getElementById('name');
+                const email = document.getElementById('email');
+                const subject = document.getElementById('subject');
+                const message = document.getElementById('message');
+                let isValid = true;
+
+                // Reset previous validation
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                // Validate name
+                if (!name.value || name.value.length < 2) {
+                    name.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email.value || !emailRegex.test(email.value)) {
+                    email.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate subject
+                if (!subject.value || subject.value.length < 3) {
+                    subject.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate message
+                if (!message.value || message.value.length < 10) {
+                    message.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return;
+                }
+                showLoading();
+            });
+
+            // Real-time validation
+            form.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        validateForm();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

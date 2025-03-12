@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTACCESS Redirect Generator - Free Online Tools</title>
+    <meta name="description" content="Generate .htaccess redirect rules with our free online tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">HTACCESS Redirect Generator</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Redirect Type:</label>
+                            <select id="redirect-type" class="form-select" aria-label="Select redirect type">
+                                <option value="301">301 - Permanent Redirect</option>
+                                <option value="302">302 - Temporary Redirect</option>
+                                <option value="303">303 - See Other</option>
+                                <option value="307">307 - Temporary Redirect (Strict)</option>
+                                <option value="308">308 - Permanent Redirect (Strict)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="old-url" class="form-label">Old URL:</label>
+                            <input type="text" id="old-url" class="form-control" placeholder="/old-page.html">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-url" class="form-label">New URL:</label>
+                            <input type="text" id="new-url" class="form-control" placeholder="https://example.com/new-page">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="wildcard-match">
+                                <label class="form-check-label" for="wildcard-match">
+                                    Use Wildcard Match
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3 text-center">
+                            <button id="generate-btn" class="btn btn-primary me-2">
+                                <i class="fas fa-code"></i> Generate Rule
+                            </button>
+                            <button id="copy-btn" class="btn btn-success">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="htaccess-output" class="form-label">Generated Rule:</label>
+                            <textarea id="htaccess-output" class="form-control code-editor" rows="10" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/apache/apache.min.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Initialize CodeMirror editor
+        const outputEditor = CodeMirror.fromTextArea(document.getElementById('htaccess-output'), {
+            mode: 'apache',
+            theme: 'monokai',
+            lineNumbers: true,
+            readOnly: true,
+            indentUnit: 4
+        });
+
+        // Generate HTACCESS rule
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const redirectType = document.getElementById('redirect-type').value;
+            const oldUrl = document.getElementById('old-url').value.trim();
+            const newUrl = document.getElementById('new-url').value.trim();
+            const useWildcard = document.getElementById('wildcard-match').checked;
+
+            if (!oldUrl || !newUrl) {
+                outputEditor.setValue('Error: Please fill in both URLs');
+                return;
+            }
+
+            let rule = '';
+
+            if (useWildcard) {
+                rule = `RewriteEngine On\n`;
+                rule += `RewriteCond %{REQUEST_URI} ^${oldUrl}(.*)$ [NC]\n`;
+                rule += `RewriteRule ^(.*)$ ${newUrl}$1 [R=${redirectType},L]`;
+            } else {
+                rule = `Redirect ${redirectType} ${oldUrl} ${newUrl}`;
+            }
+
+            outputEditor.setValue(rule);
+        });
+
+        // Copy to clipboard
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = outputEditor.getValue();
+            navigator.clipboard.writeText(output).then(() => {
+                alert('Copied to clipboard!');
+            });
+        });
+    </script>
+</body>
+</html> 

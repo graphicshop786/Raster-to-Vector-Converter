@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIF Maker - Create Animated GIFs Online</title>
+    <meta name="description" content="Free online tool to create animated GIFs from multiple images. Adjust frame delay, size, and quality.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .frame-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            border: 1px solid #dee2e6;
+            margin: 5px;
+        }
+        .frame-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .frame-remove {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+        }
+        .frame-delay {
+            width: 80px;
+            margin-top: 5px;
+        }
+        .preview-container {
+            max-width: 500px;
+            margin: auto;
+            text-align: center;
+        }
+        #gif-preview {
+            max-width: 100%;
+            max-height: 400px;
+        }
+        .progress {
+            display: none;
+            margin: 10px 0;
+        }
+        #frames-container {
+            min-height: 100px;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #frames-container.dragover {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+        /* New styles for GIF search */
+        .gif-search-container {
+            margin-bottom: 20px;
+        }
+        .gif-search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .gif-search-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .gif-search-item:hover {
+            transform: scale(1.05);
+        }
+        .gif-search-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .gif-search-item .add-frame {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .gif-search-item:hover .add-frame {
+            opacity: 1;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .loader::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>GIF Maker</h1>
+                <p class="lead">Create animated GIFs from multiple images</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="image-input" class="form-label">Add Images:</label>
+                        <input type="file" class="form-control" id="image-input" accept="image/*" multiple>
+                        <div class="form-text">Select multiple images to create frames</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div id="frames-container" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <p class="text-muted mb-0">Drag and drop images here or use the file input above</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">GIF Settings</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="width" class="form-label">Width (pixels):</label>
+                                        <input type="number" class="form-control" id="width" placeholder="Auto">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="height" class="form-label">Height (pixels):</label>
+                                        <input type="number" class="form-control" id="height" placeholder="Auto">
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="frame-delay" class="form-label">Frame Delay (ms):</label>
+                                        <input type="number" class="form-control" id="frame-delay" value="500" min="10">
+                                        <div class="form-text">Time between frames (1000ms = 1 second)</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="quality" class="form-label">Quality:</label>
+                                        <input type="range" class="form-range" id="quality" min="1" max="20" value="10">
+                                        <div class="form-text">Lower quality = smaller file size</div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="loop" checked>
+                                            <label class="form-check-label" for="loop">
+                                                Loop animation
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Search GIFs</h5>
+                                <div class="gif-search-container">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="gif-search" placeholder="Search for GIFs...">
+                                        <button class="btn btn-primary" onclick="searchGIFs()">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                    </div>
+                                    <div class="loader" id="gif-loader"></div>
+                                    <div class="gif-search-results" id="gif-results"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%">
+                                <span class="progress-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="preview-container">
+                            <h5>Preview:</h5>
+                            <img id="gif-preview" alt="GIF preview">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="createGIF()">
+                            <i class="fas fa-magic me-2"></i>Create GIF
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadGIF()">
+                            <i class="fas fa-download me-2"></i>Download GIF
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About GIF Creation</h3>
+                    <p>Create animated GIFs from a series of images. Features include:</p>
+                    <ul>
+                        <li>Multiple image upload</li>
+                        <li>Drag and drop support</li>
+                        <li>Adjustable frame delays</li>
+                        <li>Custom dimensions</li>
+                        <li>Quality control</li>
+                        <li>Loop control</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tip: For smooth animations, use images of the same size and keep frame delays consistent.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- GIF.js -->
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+    <!-- Sortable.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <!-- Custom JS -->
+  
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // GIF Maker Tool JavaScript
+        let frames = [];
+        let generatedGIF = null;
+        const GIPHY_API_KEY = "kR9lHk7wuV9TQYuRP97zirVFySiOfqYj";
+
+        // Initialize Sortable
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('frames-container')) {
+                new Sortable(document.getElementById('frames-container'), {
+                    animation: 150,
+                    draggable: '.frame-container'
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('image-input')) {
+                document.getElementById('image-input').addEventListener('change', function(e) {
+                    handleFiles(e.target.files);
+                });
+            }
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            frames.push({
+                                element: img,
+                                delay: parseInt(document.getElementById('frame-delay').value)
+                            });
+                            updatePreview();
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('frames-container').classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('frames-container').classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('frames-container').classList.remove('dragover');
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('frames-container');
+            container.innerHTML = '';
+
+            if (frames.length === 0) {
+                container.innerHTML = '<p class="text-muted mb-0">Drag and drop images here or use the file input above</p>';
+                return;
+            }
+
+            frames.forEach((frame, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'frame-container';
+                preview.innerHTML = `
+                    <img src="${frame.element.src}" class="frame-preview" alt="Frame ${index + 1}">
+                    <div class="frame-remove" onclick="removeFrame(${index})">×</div>
+                    <input type="number" class="form-control form-control-sm frame-delay" 
+                           value="${frame.delay}" min="10" 
+                           onchange="updateFrameDelay(${index}, this.value)"
+                           aria-label="Frame delay in milliseconds">
+                `;
+                container.appendChild(preview);
+            });
+        }
+
+        function removeFrame(index) {
+            frames.splice(index, 1);
+            updatePreview();
+        }
+
+        function updateFrameDelay(index, delay) {
+            frames[index].delay = parseInt(delay);
+        }
+
+        function createGIF() {
+            if (frames.length < 2) {
+                alert('Please add at least 2 images.');
+                return;
+            }
+
+            const width = parseInt(document.getElementById('width').value) || frames[0].element.width;
+            const height = parseInt(document.getElementById('height').value) || frames[0].element.height;
+            const quality = parseInt(document.getElementById('quality').value);
+            const loop = document.getElementById('loop').checked ? 0 : 1;
+
+            // Get progress elements
+            const progressElement = document.querySelector('.progress');
+            const progressBar = progressElement.querySelector('.progress-bar');
+            const progressText = progressElement.querySelector('.progress-text');
+            progressElement.style.display = 'block';
+
+            try {
+                // Create a single canvas for processing frames
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d', { 
+                    willReadFrequently: true,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
+                });
+
+                // Create GIF encoder without web worker
+                const gif = new GIF({
+                    workers: 0,  // Disable web workers
+                    quality: quality,
+                    width: width,
+                    height: height,
+                    repeat: loop
+                });
+
+                // Process frames
+                frames.forEach((frame, index) => {
+                    // Clear canvas and draw frame
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.drawImage(frame.element, 0, 0, width, height);
+                    
+                    // Get frame data
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    
+                    // Add frame to GIF
+                    gif.addFrame(imageData, {
+                        delay: frame.delay,
+                        copy: true
+                    });
+
+                    // Update progress
+                    const percent = Math.round((index + 1) / frames.length * 100);
+                    progressBar.style.width = `${percent}%`;
+                    progressText.textContent = `${percent}%`;
+                });
+
+                gif.on('finished', blob => {
+                    if (generatedGIF) {
+                        URL.revokeObjectURL(generatedGIF);
+                    }
+                    generatedGIF = URL.createObjectURL(blob);
+                    document.getElementById('gif-preview').src = generatedGIF;
+                    progressElement.style.display = 'none';
+                });
+
+                gif.on('error', error => {
+                    console.error('GIF generation error:', error);
+                    alert('Error creating GIF. Please try again.');
+                    progressElement.style.display = 'none';
+                });
+
+                gif.render();
+            } catch (error) {
+                console.error('Error creating GIF:', error);
+                alert('Error creating GIF. Please try again.');
+                progressElement.style.display = 'none';
+            }
+        }
+
+        function downloadGIF() {
+            if (!generatedGIF) {
+                alert('Please create a GIF first.');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.download = 'animated.gif';
+            link.href = generatedGIF;
+            link.click();
+        }
+
+        function clearForm() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('height').value = '';
+            document.getElementById('frame-delay').value = '500';
+            document.getElementById('quality').value = '10';
+            document.getElementById('loop').checked = true;
+            document.getElementById('gif-preview').src = '';
+            document.querySelector('.progress').style.display = 'none';
+            frames = [];
+            generatedGIF = null;
+            updatePreview();
+        }
+
+        async function searchGIFs() {
+            const searchInput = document.getElementById('gif-search');
+            const loader = document.getElementById('gif-loader');
+            const resultsContainer = document.getElementById('gif-results');
+            
+            if (!searchInput.value.trim()) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            loader.style.display = 'block';
+            resultsContainer.innerHTML = '';
+
+            try {
+                const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchInput.value)}&limit=12&rating=g&lang=en`);
+                const data = await response.json();
+
+                if (data.data && data.data.length > 0) {
+                    data.data.forEach(gif => {
+                        const gifItem = document.createElement('div');
+                        gifItem.className = 'gif-search-item';
+                        gifItem.innerHTML = `
+                            <img src="${gif.images.downsized_medium.url}" alt="${gif.title}">
+                            <div class="add-frame">Click to add frame</div>
+                        `;
+                        
+                        gifItem.addEventListener('click', () => {
+                            addGifFrame(gif.images.downsized_medium.url);
+                        });
+                        
+                        resultsContainer.appendChild(gifItem);
+                    });
+                } else {
+                    resultsContainer.innerHTML = '<p class="text-center">No GIFs found</p>';
+                }
+            } catch (error) {
+                console.error('Error searching GIFs:', error);
+                resultsContainer.innerHTML = '<p class="text-center text-danger">Error searching GIFs. Please try again.</p>';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function addGifFrame(url) {
+            const img = new Image();
+            img.onload = function() {
+                frames.push({
+                    element: img,
+                    delay: parseInt(document.getElementById('frame-delay').value)
+                });
+                updatePreview();
+            };
+            img.src = url;
+        }
+    </script>
+</body>
+</html> 

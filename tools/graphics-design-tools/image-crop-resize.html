@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Crop & Resize Tool - Free Graphics Design Tools</title>
+    <meta name="description" content="Easily crop and resize your images online. Free tool for quick image editing with preview and download options.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .image-container {
+            max-width: 100%;
+            position: relative;
+        }
+        
+        #preview {
+            max-width: 100%;
+            display: block;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #6c757d;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .controls-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .aspect-ratio-btn {
+            margin: 5px;
+        }
+        
+        .preview-container {
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Image Crop & Resize Tool</h1>
+                <p class="lead">Upload, crop, and resize your images with our easy-to-use tool</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Image Upload/Preview Area -->
+                        <div id="upload-container" class="upload-zone mb-4">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <h4>Drop your image here</h4>
+                            <p class="text-muted">or click to select a file</p>
+                            <input type="file" id="file-input" class="d-none" accept="image/*" title="Upload image">
+                        </div>
+
+                        <div id="editor-container" class="d-none">
+                            <div class="image-container mb-4">
+                                <img id="preview" src="#" alt="Preview">
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="controls-section">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Aspect Ratio</h5>
+                                        <div class="btn-group mb-3">
+                                            <button class="btn btn-outline-primary aspect-ratio-btn" data-ratio="free" title="Free aspect ratio">Free</button>
+                                            <button class="btn btn-outline-primary aspect-ratio-btn" data-ratio="1" title="Square (1:1)">1:1</button>
+                                            <button class="btn btn-outline-primary aspect-ratio-btn" data-ratio="4/3" title="4:3 ratio">4:3</button>
+                                            <button class="btn btn-outline-primary aspect-ratio-btn" data-ratio="16/9" title="16:9 ratio">16:9</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Rotation</h5>
+                                        <div class="btn-group mb-3">
+                                            <button id="rotate-left" class="btn btn-outline-secondary" title="Rotate left">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button id="rotate-right" class="btn btn-outline-secondary" title="Rotate right">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                            <button id="flip-h" class="btn btn-outline-secondary" title="Flip horizontal">
+                                                <i class="fas fa-arrows-alt-h"></i>
+                                            </button>
+                                            <button id="flip-v" class="btn btn-outline-secondary" title="Flip vertical">
+                                                <i class="fas fa-arrows-alt-v"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Resize</h5>
+                                        <div class="mb-3">
+                                            <label for="width" class="form-label">Width (px)</label>
+                                            <input type="number" id="width" class="form-control" min="1" title="Image width">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="height" class="form-label">Height (px)</label>
+                                            <input type="number" id="height" class="form-control" min="1" title="Image height">
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" id="maintain-aspect" class="form-check-input" checked title="Maintain aspect ratio">
+                                            <label class="form-check-label" for="maintain-aspect">Maintain aspect ratio</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Quality</h5>
+                                        <div class="mb-3">
+                                            <label for="quality" class="form-label">JPEG Quality</label>
+                                            <input type="range" id="quality" class="form-range" min="0" max="100" value="90" title="Image quality">
+                                            <div class="text-muted small">Selected: <span id="quality-value">90</span>%</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between">
+                                            <button id="reset-btn" class="btn btn-outline-secondary" title="Reset changes">
+                                                <i class="fas fa-undo me-2"></i>Reset
+                                            </button>
+                                            <div>
+                                                <button id="preview-btn" class="btn btn-outline-primary me-2" title="Preview changes">
+                                                    <i class="fas fa-eye me-2"></i>Preview
+                                                </button>
+                                                <button id="download-btn" class="btn btn-primary" title="Download image">
+                                                    <i class="fas fa-download me-2"></i>Download
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Instructions -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">How to Use</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol class="mb-0">
+                                    <li>Upload your image by dropping it or clicking the upload area</li>
+                                    <li>Choose an aspect ratio or use free-form cropping</li>
+                                    <li>Adjust the crop area by dragging the corners</li>
+                                    <li>Rotate or flip the image if needed</li>
+                                    <li>Set custom dimensions for resizing</li>
+                                    <li>Adjust quality for JPEG images</li>
+                                    <li>Preview your changes</li>
+                                    <li>Download the edited image</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="preview-container" class="card mt-4 d-none">
+                            <div class="card-header">
+                                <h5 class="mb-0">Preview</h5>
+                            </div>
+                            <div class="card-body">
+                                <img id="result-preview" class="img-fluid" alt="Result preview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div class="loading">
+        <div class="spinner-border text-primary spinner" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const fileInput = document.getElementById('file-input');
+            const uploadContainer = document.getElementById('upload-container');
+            const editorContainer = document.getElementById('editor-container');
+            const preview = document.getElementById('preview');
+            const previewContainer = document.getElementById('preview-container');
+            const resultPreview = document.getElementById('result-preview');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            const maintainAspect = document.getElementById('maintain-aspect');
+            const qualityInput = document.getElementById('quality');
+            const qualityValue = document.getElementById('quality-value');
+            const loading = document.querySelector('.loading');
+            
+            let cropper = null;
+            let originalWidth = 0;
+            let originalHeight = 0;
+            let aspectRatio = null;
+            
+            // Initialize upload zone
+            uploadContainer.addEventListener('click', () => fileInput.click());
+            uploadContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadContainer.style.borderColor = '#0d6efd';
+            });
+            uploadContainer.addEventListener('dragleave', () => {
+                uploadContainer.style.borderColor = '#dee2e6';
+            });
+            uploadContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadContainer.style.borderColor = '#dee2e6';
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+            
+            // Handle file upload
+            function handleFile(file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please upload an image file.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    uploadContainer.classList.add('d-none');
+                    editorContainer.classList.remove('d-none');
+                    
+                    // Initialize cropper
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(preview, {
+                        viewMode: 2,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        restore: false,
+                        ready() {
+                            originalWidth = cropper.getImageData().naturalWidth;
+                            originalHeight = cropper.getImageData().naturalHeight;
+                            widthInput.value = originalWidth;
+                            heightInput.value = originalHeight;
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Aspect ratio buttons
+            document.querySelectorAll('.aspect-ratio-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelector('.aspect-ratio-btn.active')?.classList.remove('active');
+                    this.classList.add('active');
+                    
+                    const ratio = this.dataset.ratio;
+                    aspectRatio = ratio === 'free' ? null : eval(ratio);
+                    cropper.setAspectRatio(aspectRatio);
+                });
+            });
+            
+            // Rotation and flip controls
+            document.getElementById('rotate-left').addEventListener('click', () => cropper.rotate(-90));
+            document.getElementById('rotate-right').addEventListener('click', () => cropper.rotate(90));
+            document.getElementById('flip-h').addEventListener('click', () => cropper.scaleX(cropper.getData().scaleX * -1));
+            document.getElementById('flip-v').addEventListener('click', () => cropper.scaleY(cropper.getData().scaleY * -1));
+            
+            // Dimension inputs
+            widthInput.addEventListener('input', function() {
+                if (maintainAspect.checked && originalWidth && originalHeight) {
+                    heightInput.value = Math.round(this.value * (originalHeight / originalWidth));
+                }
+            });
+            
+            heightInput.addEventListener('input', function() {
+                if (maintainAspect.checked && originalWidth && originalHeight) {
+                    widthInput.value = Math.round(this.value * (originalWidth / originalHeight));
+                }
+            });
+            
+            // Quality slider
+            qualityInput.addEventListener('input', function() {
+                qualityValue.textContent = this.value;
+            });
+            
+            // Preview button
+            document.getElementById('preview-btn').addEventListener('click', () => {
+                loading.style.display = 'flex';
+                setTimeout(() => {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: parseInt(widthInput.value),
+                        height: parseInt(heightInput.value)
+                    });
+                    
+                    resultPreview.src = canvas.toDataURL('image/jpeg', qualityInput.value / 100);
+                    previewContainer.classList.remove('d-none');
+                    loading.style.display = 'none';
+                }, 100);
+            });
+            
+            // Download button
+            document.getElementById('download-btn').addEventListener('click', () => {
+                loading.style.display = 'flex';
+                setTimeout(() => {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: parseInt(widthInput.value),
+                        height: parseInt(heightInput.value)
+                    });
+                    
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'edited-image.jpg';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        loading.style.display = 'none';
+                    }, 'image/jpeg', qualityInput.value / 100);
+                }, 100);
+            });
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (cropper) {
+                    cropper.reset();
+                    cropper.setAspectRatio(null);
+                    document.querySelector('.aspect-ratio-btn.active')?.classList.remove('active');
+                    document.querySelector('[data-ratio="free"]').classList.add('active');
+                    widthInput.value = originalWidth;
+                    heightInput.value = originalHeight;
+                    qualityInput.value = 90;
+                    qualityValue.textContent = '90';
+                    previewContainer.classList.add('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

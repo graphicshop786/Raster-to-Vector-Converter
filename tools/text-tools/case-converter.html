@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Case Converter - MultiTools</title>
+    <meta name="description" content="Convert text between different cases (uppercase, lowercase, title case, etc.)">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Text Case Converter</h1>
+                <p class="lead">Convert text between different cases (uppercase, lowercase, title case, etc.)</p>
+            </div>
+
+            <div class="tool-content">
+                <form id="caseConverterForm" class="tool-form">
+                    <div class="mb-3">
+                        <label for="inputText" class="form-label">Enter your text</label>
+                        <textarea class="form-control" id="inputText" rows="6" placeholder="Type or paste your text here..." required></textarea>
+                    </div>
+                    <div class="btn-group mb-3" role="group" aria-label="Text case options">
+                        <button type="button" class="btn btn-outline-primary" data-case="upper">UPPERCASE</button>
+                        <button type="button" class="btn btn-outline-primary" data-case="lower">lowercase</button>
+                        <button type="button" class="btn btn-outline-primary" data-case="title">Title Case</button>
+                        <button type="button" class="btn btn-outline-primary" data-case="sentence">Sentence case</button>
+                        <button type="button" class="btn btn-outline-primary" data-case="camel">camelCase</button>
+                        <button type="button" class="btn btn-outline-primary" data-case="pascal">PascalCase</button>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outputText" class="form-label">Converted text</label>
+                        <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                    </div>
+                    <button type="button" class="btn btn-success" id="copyButton">
+                        <i class="fas fa-copy me-2"></i>Copy to Clipboard
+                    </button>
+                    <button type="button" class="btn btn-danger" id="clearButton">
+                        <i class="fas fa-trash-alt me-2"></i>Clear
+                    </button>
+                </form>
+            </div>
+
+            <div class="tool-instructions mt-4">
+                <h3>How to use:</h3>
+                <ol>
+                    <li>Enter or paste your text in the input box</li>
+                    <li>Click one of the case conversion buttons</li>
+                    <li>Your converted text will appear in the output box</li>
+                    <li>Click "Copy to Clipboard" to copy the converted text</li>
+                    <li>Use "Clear" to reset both input and output fields</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/text-tools/case-converter.js"></script>
+</body>
+</html> 

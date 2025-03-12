@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot to PDF Converter - Convert Images to PDF</title>
+    <meta name="description" content="Free online tool to convert screenshots and images into a PDF document. Combine multiple images into a single PDF file.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: contain;
+            margin: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .preview-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .remove-image {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+        }
+        .drag-handle {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #6c757d;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            cursor: move;
+        }
+        #images-container {
+            min-height: 100px;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #images-container.dragover {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Screenshot to PDF Converter</h1>
+                <p class="lead">Convert screenshots and images into a PDF document</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="image-input" class="form-label">Select Images:</label>
+                        <input type="file" class="form-control" id="image-input" accept="image/*" multiple>
+                        <div class="form-text">Supported formats: JPG, PNG, GIF, WebP</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div id="images-container" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <p class="text-muted mb-0">Drag and drop images here or use the file input above</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">PDF Settings</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="page-size" class="form-label">Page Size:</label>
+                                        <select class="form-select" id="page-size">
+                                            <option value="a4">A4</option>
+                                            <option value="letter">Letter</option>
+                                            <option value="legal">Legal</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="orientation" class="form-label">Orientation:</label>
+                                        <select class="form-select" id="orientation">
+                                            <option value="portrait">Portrait</option>
+                                            <option value="landscape">Landscape</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="margin" class="form-label">Margin (mm):</label>
+                                        <input type="number" class="form-control" id="margin" value="10" min="0" max="50">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="quality" class="form-label">Image Quality:</label>
+                                        <input type="range" class="form-range" id="quality" min="1" max="100" value="90">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="convertToPDF()">
+                            <i class="fas fa-file-pdf me-2"></i>Convert to PDF
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Screenshot to PDF Conversion</h3>
+                    <p>Convert your screenshots and images into a professional PDF document. Features include:</p>
+                    <ul>
+                        <li>Multiple image upload</li>
+                        <li>Drag and drop support</li>
+                        <li>Reorder images</li>
+                        <li>Customizable page settings</li>
+                        <li>Quality control</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tip: Drag and drop images to reorder them in the PDF. Remove unwanted images by clicking the X button.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Sortable.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Screenshot to PDF Converter Tool JavaScript
+        let images = [];
+        const { jsPDF } = window.jspdf;
+
+        // Initialize Sortable
+        new Sortable(document.getElementById('images-container'), {
+            animation: 150,
+            handle: '.drag-handle'
+        });
+
+        document.getElementById('image-input').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            images.push({
+                                data: e.target.result,
+                                width: img.width,
+                                height: img.height
+                            });
+                            updatePreview();
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('images-container').classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('images-container').classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('images-container').classList.remove('dragover');
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('images-container');
+            container.innerHTML = '';
+
+            if (images.length === 0) {
+                container.innerHTML = '<p class="text-muted mb-0">Drag and drop images here or use the file input above</p>';
+                return;
+            }
+
+            images.forEach((image, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'preview-container';
+                preview.innerHTML = `
+                    <img src="${image.data}" class="image-preview" alt="Preview ${index + 1}">
+                    <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                    <div class="remove-image" onclick="removeImage(${index})">×</div>
+                `;
+                container.appendChild(preview);
+            });
+        }
+
+        function removeImage(index) {
+            images.splice(index, 1);
+            updatePreview();
+        }
+
+        function convertToPDF() {
+            if (images.length === 0) {
+                alert('Please add at least one image.');
+                return;
+            }
+
+            const pageSize = document.getElementById('page-size').value;
+            const orientation = document.getElementById('orientation').value;
+            const margin = parseInt(document.getElementById('margin').value);
+            const quality = document.getElementById('quality').value / 100;
+
+            const pdf = new jsPDF({
+                orientation: orientation,
+                unit: 'mm',
+                format: pageSize
+            });
+
+            let currentPage = 0;
+            const processImage = (index) => {
+                if (index >= images.length) {
+                    pdf.save('screenshots.pdf');
+                    return;
+                }
+
+                const image = images[index];
+                if (currentPage > 0) {
+                    pdf.addPage();
+                }
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const maxWidth = pageWidth - (margin * 2);
+                const maxHeight = pageHeight - (margin * 2);
+
+                let imgWidth = image.width;
+                let imgHeight = image.height;
+
+                if (imgWidth > maxWidth) {
+                    const ratio = maxWidth / imgWidth;
+                    imgWidth = maxWidth;
+                    imgHeight = imgHeight * ratio;
+                }
+
+                if (imgHeight > maxHeight) {
+                    const ratio = maxHeight / imgHeight;
+                    imgHeight = maxHeight;
+                    imgWidth = imgWidth * ratio;
+                }
+
+                const x = margin + (maxWidth - imgWidth) / 2;
+                const y = margin + (maxHeight - imgHeight) / 2;
+
+                pdf.addImage(image.data, 'JPEG', x, y, imgWidth, imgHeight, '', quality);
+                currentPage++;
+                processImage(index + 1);
+            };
+
+            processImage(0);
+        }
+
+        function clearForm() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('page-size').value = 'a4';
+            document.getElementById('orientation').value = 'portrait';
+            document.getElementById('margin').value = '10';
+            document.getElementById('quality').value = '90';
+            images = [];
+            updatePreview();
+        }
+    </script>
+</body>
+</html> 

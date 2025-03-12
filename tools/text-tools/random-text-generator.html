@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Text Generator - Free Online Tools</title>
+    <meta name="description" content="Generate random text, Lorem Ipsum, and custom text patterns with our free online Random Text Generator tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Random Text Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Generator Options -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Generator Options</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Text Type</label>
+                            <select class="form-select" id="textType" title="Select text generation type">
+                                <option value="lorem">Lorem Ipsum</option>
+                                <option value="words">Random Words</option>
+                                <option value="sentences">Random Sentences</option>
+                                <option value="paragraphs">Random Paragraphs</option>
+                                <option value="custom">Custom Pattern</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="textLength" class="form-label">Length</label>
+                                <input type="number" class="form-control" id="textLength" min="1" value="5">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lengthType" class="form-label">Length Type</label>
+                                <select class="form-select" id="lengthType" title="Select length type">
+                                    <option value="words">Words</option>
+                                    <option value="sentences">Sentences</option>
+                                    <option value="paragraphs">Paragraphs</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Pattern Options (hidden by default) -->
+                        <div id="customOptions" class="mt-3 d-none">
+                            <div class="mb-3">
+                                <label for="customPattern" class="form-label">Custom Pattern</label>
+                                <input type="text" class="form-control" id="customPattern" placeholder="Example: [A-Z]{5}[0-9]{3}">
+                                <div class="form-text">Use regex-like patterns: [A-Z], [a-z], [0-9], etc.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="startWithCapital" checked>
+                                <label class="form-check-label" for="startWithCapital">
+                                    Start with capital letter
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="addPunctuation" checked>
+                                <label class="form-check-label" for="addPunctuation">
+                                    Add punctuation
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 mt-3" onclick="generateText()">
+                            <i class="fas fa-random"></i> Generate Text
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generated Text -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Generated Text</h5>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="generatedText" rows="8" readonly title="Generated text result"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary" onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i> Copy to Clipboard
+                            </button>
+                            <button class="btn btn-success" onclick="generateText()">
+                                <i class="fas fa-sync-alt"></i> Generate New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Generation History</h5>
+                        <div class="list-group" id="historyList">
+                            <!-- History items will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const textType = document.getElementById('textType');
+        const textLength = document.getElementById('textLength');
+        const lengthType = document.getElementById('lengthType');
+        const customOptions = document.getElementById('customOptions');
+        const customPattern = document.getElementById('customPattern');
+        const startWithCapital = document.getElementById('startWithCapital');
+        const addPunctuation = document.getElementById('addPunctuation');
+        const generatedText = document.getElementById('generatedText');
+        const historyList = document.getElementById('historyList');
+        
+        // Word lists for random generation
+        const words = [
+            'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
+            'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
+            'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation',
+            'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo', 'consequat'
+        ];
+        
+        const conjunctions = ['and', 'but', 'or', 'nor', 'for', 'yet', 'so'];
+        const prepositions = ['in', 'on', 'at', 'with', 'by', 'to', 'for', 'from'];
+        const punctuation = ['.', '!', '?'];
+        
+        // Show/hide custom options based on text type
+        textType.addEventListener('change', () => {
+            customOptions.classList.toggle('d-none', textType.value !== 'custom');
+        });
+        
+        function generateText() {
+            let result = '';
+            
+            switch (textType.value) {
+                case 'lorem':
+                    result = generateLoremIpsum();
+                    break;
+                case 'words':
+                    result = generateRandomWords();
+                    break;
+                case 'sentences':
+                    result = generateRandomSentences();
+                    break;
+                case 'paragraphs':
+                    result = generateRandomParagraphs();
+                    break;
+                case 'custom':
+                    result = generateCustomPattern();
+                    break;
+            }
+            
+            generatedText.value = result;
+            addToHistory(result);
+        }
+        
+        function generateLoremIpsum() {
+            const count = parseInt(textLength.value);
+            let result = 'Lorem ipsum dolor sit amet, ';
+            
+            if (lengthType.value === 'words') {
+                result += generateRandomWords(count - 5);
+            } else if (lengthType.value === 'sentences') {
+                result += generateRandomSentences(count - 1);
+            } else {
+                result += generateRandomParagraphs(count - 1);
+            }
+            
+            return result;
+        }
+        
+        function generateRandomWords(count = parseInt(textLength.value)) {
+            return Array(count)
+                .fill()
+                .map(() => words[Math.floor(Math.random() * words.length)])
+                .join(' ');
+        }
+        
+        function generateRandomSentences(count = parseInt(textLength.value)) {
+            return Array(count)
+                .fill()
+                .map(() => {
+                    const wordCount = Math.floor(Math.random() * 8) + 4;
+                    let sentence = generateRandomWords(wordCount);
+                    
+                    if (startWithCapital.checked) {
+                        sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+                    }
+                    
+                    if (addPunctuation.checked) {
+                        sentence += punctuation[Math.floor(Math.random() * punctuation.length)];
+                    }
+                    
+                    return sentence;
+                })
+                .join(' ');
+        }
+        
+        function generateRandomParagraphs(count = parseInt(textLength.value)) {
+            return Array(count)
+                .fill()
+                .map(() => {
+                    const sentenceCount = Math.floor(Math.random() * 4) + 3;
+                    return generateRandomSentences(sentenceCount);
+                })
+                .join('\n\n');
+        }
+        
+        function generateCustomPattern() {
+            const pattern = customPattern.value;
+            let result = '';
+            
+            // Simple pattern parsing
+            for (let i = 0; i < pattern.length; i++) {
+                if (pattern[i] === '[') {
+                    const end = pattern.indexOf(']', i);
+                    if (end === -1) break;
+                    
+                    const range = pattern.substring(i + 1, end);
+                    const count = pattern[end + 1] === '{' ? 
+                        parseInt(pattern.substring(end + 2, pattern.indexOf('}', end))) : 1;
+                    
+                    for (let j = 0; j < count; j++) {
+                        result += getRandomFromRange(range);
+                    }
+                    
+                    i = pattern.indexOf('}', end) !== -1 ? 
+                        pattern.indexOf('}', end) : end;
+                } else {
+                    result += pattern[i];
+                }
+            }
+            
+            return result;
+        }
+        
+        function getRandomFromRange(range) {
+            if (range === 'A-Z') return String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            if (range === 'a-z') return String.fromCharCode(97 + Math.floor(Math.random() * 26));
+            if (range === '0-9') return Math.floor(Math.random() * 10).toString();
+            return range[Math.floor(Math.random() * range.length)];
+        }
+        
+        function copyToClipboard() {
+            generatedText.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const tooltip = document.createElement('div');
+            tooltip.className = 'alert alert-success position-fixed bottom-0 end-0 m-3';
+            tooltip.textContent = 'Copied to clipboard!';
+            document.body.appendChild(tooltip);
+            
+            setTimeout(() => {
+                tooltip.remove();
+            }, 2000);
+        }
+        
+        function addToHistory(text) {
+            const timestamp = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = 'list-group-item';
+            
+            const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+            
+            item.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">${shortText}</p>
+                        <small class="text-muted">${timestamp} - ${textType.value}, ${textLength.value} ${lengthType.value}</small>
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="restoreText(this)" data-text="${encodeURIComponent(text)}">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            `;
+            
+            historyList.insertBefore(item, historyList.firstChild);
+            
+            // Keep only last 5 items
+            while (historyList.children.length > 5) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+        
+        function restoreText(button) {
+            generatedText.value = decodeURIComponent(button.dataset.text);
+        }
+        
+        // Initialize with empty history
+        historyList.innerHTML = '<p class="text-muted text-center mb-0">No generation history</p>';
+        
+        // Generate initial text
+        generateText();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Converter - Free Online Tools</title>
+    <meta name="description" content="Convert between different energy units including joules, calories, kilowatt-hours, BTUs, and more with our free online Energy Converter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="converter-style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Energy Converter</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="converter-container">
+                            <div class="input-group mb-3">
+                                <input type="number" id="fromValue" class="form-control" placeholder="Enter value" aria-label="Enter value to convert">
+                                <select id="fromUnit" class="form-select" aria-label="Select source unit">
+                                    <option value="j">Joules (J)</option>
+                                    <option value="kj">Kilojoules (kJ)</option>
+                                    <option value="cal">Calories (cal)</option>
+                                    <option value="kcal">Kilocalories (kcal)</option>
+                                    <option value="wh">Watt-hours (Wh)</option>
+                                    <option value="kwh">Kilowatt-hours (kWh)</option>
+                                    <option value="btu">BTU</option>
+                                    <option value="therm">Therms</option>
+                                    <option value="ftlb">Foot-pounds</option>
+                                    <option value="ev">Electron volts (eV)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <button class="btn btn-primary" onclick="swapUnits()">
+                                    <i class="fas fa-exchange-alt"></i> Swap
+                                </button>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <input type="number" id="toValue" class="form-control" readonly aria-label="Converted value">
+                                <select id="toUnit" class="form-select" aria-label="Select target unit">
+                                    <option value="kj">Kilojoules (kJ)</option>
+                                    <option value="j">Joules (J)</option>
+                                    <option value="cal">Calories (cal)</option>
+                                    <option value="kcal">Kilocalories (kcal)</option>
+                                    <option value="wh">Watt-hours (Wh)</option>
+                                    <option value="kwh">Kilowatt-hours (kWh)</option>
+                                    <option value="btu">BTU</option>
+                                    <option value="therm">Therms</option>
+                                    <option value="ftlb">Foot-pounds</option>
+                                    <option value="ev">Electron volts (eV)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-success" onclick="copyResult()">
+                                    <i class="fas fa-copy"></i> Copy Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Conversions -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Common Energy Conversions</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Multiply by</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Joules</td>
+                                        <td>Calories</td>
+                                        <td>0.239006</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kilocalories</td>
+                                        <td>Kilojoules</td>
+                                        <td>4.184</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Watt-hours</td>
+                                        <td>Joules</td>
+                                        <td>3,600</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BTU</td>
+                                        <td>Joules</td>
+                                        <td>1,055.06</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Conversion factors to joules
+        const conversionFactors = {
+            j: 1,
+            kj: 1000,
+            cal: 4.184,
+            kcal: 4184,
+            wh: 3600,
+            kwh: 3600000,
+            btu: 1055.06,
+            therm: 105506000,
+            ftlb: 1.35582,
+            ev: 1.602177e-19
+        };
+
+        // Convert function
+        function convert() {
+            const fromValue = parseFloat(document.getElementById('fromValue').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            
+            if (isNaN(fromValue)) {
+                document.getElementById('toValue').value = '';
+                return;
+            }
+            
+            // Convert to joules first, then to target unit
+            const joules = fromValue * conversionFactors[fromUnit];
+            const result = joules / conversionFactors[toUnit];
+            
+            document.getElementById('toValue').value = result.toFixed(6);
+        }
+
+        // Swap units function
+        function swapUnits() {
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            const fromValue = document.getElementById('fromValue');
+            const toValue = document.getElementById('toValue');
+            
+            [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+            
+            if (fromValue.value !== '') {
+                convert();
+            }
+        }
+
+        // Copy result function
+        function copyResult() {
+            const toValue = document.getElementById('toValue');
+            const toUnit = document.getElementById('toUnit');
+            
+            if (toValue.value === '') return;
+            
+            const textToCopy = `${toValue.value} ${toUnit.options[toUnit.selectedIndex].text}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Result copied to clipboard!');
+            });
+        }
+
+        // Add event listeners
+        document.getElementById('fromValue').addEventListener('input', convert);
+        document.getElementById('fromUnit').addEventListener('change', convert);
+        document.getElementById('toUnit').addEventListener('change', convert);
+    </script>
+</body>
+</html> 

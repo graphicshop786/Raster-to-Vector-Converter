@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator - Free Online Tools</title>
+    <meta name="description" content="Create custom memes with our free online meme generator. Add text, upload images, and customize your memes easily.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .meme-canvas-container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #memeCanvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .template-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        .template-preview:hover {
+            border-color: #0d6efd;
+        }
+        .template-selected {
+            border-color: #0d6efd;
+        }
+        .history-item {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .history-item:hover {
+            transform: scale(1.02);
+        }
+        .history-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Meme Generator</h1>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Meme Canvas -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="meme-canvas-container mb-3">
+                            <canvas id="memeCanvas" width="600" height="600">
+                                Your browser does not support the canvas element.
+                            </canvas>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-primary" onclick="downloadMeme('PNG')">
+                                <i class="fas fa-download"></i> Download PNG
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadMeme('JPG')">
+                                <i class="fas fa-download"></i> Download JPG
+                            </button>
+                            <button class="btn btn-danger" onclick="resetCanvas()">
+                                <i class="fas fa-trash"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meme Controls -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Customize Meme</h5>
+                        
+                        <!-- Image Upload -->
+                        <div class="mb-3">
+                            <label for="imageUpload" class="form-label">Upload Image or Choose Template</label>
+                            <input type="file" class="form-control" id="imageUpload" accept="image/*">
+                        </div>
+
+                        <!-- Text Inputs -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="topText" class="form-label">Top Text</label>
+                                <input type="text" class="form-control" id="topText" placeholder="Enter top text">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bottomText" class="form-label">Bottom Text</label>
+                                <input type="text" class="form-control" id="bottomText" placeholder="Enter bottom text">
+                            </div>
+                        </div>
+
+                        <!-- Text Style Controls -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="fontSize" class="form-label">Font Size</label>
+                                <input type="range" class="form-range" id="fontSize" min="20" max="100" value="50">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="textColor" class="form-label">Text Color</label>
+                                <input type="color" class="form-control form-control-color" id="textColor" value="#ffffff">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="strokeColor" class="form-label">Stroke Color</label>
+                                <input type="color" class="form-control form-control-color" id="strokeColor" value="#000000">
+                            </div>
+                        </div>
+
+                        <!-- Font Selection -->
+                        <div class="mb-3">
+                            <label for="fontFamily" class="form-label">Font Style</label>
+                            <select class="form-select" id="fontFamily">
+                                <option value="Impact">Impact (Classic Meme)</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Templates -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Popular Templates</h5>
+                        <div class="d-flex flex-wrap gap-2" id="templateContainer">
+                            <!-- Template previews will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Memes -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Memes</h5>
+                        <div id="recentMemes" class="d-flex flex-wrap gap-2">
+                            <!-- Recent memes will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About Meme Generator</h5>
+                        <p>Create custom memes easily:</p>
+                        <ul class="mb-0">
+                            <li>Upload your own images or use templates</li>
+                            <li>Add custom text with various styles</li>
+                            <li>Download in PNG or JPG format</li>
+                            <li>Save recent memes for quick access</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> Your memes are created locally and not stored on any server.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Canvas and context
+        const canvas = document.getElementById('memeCanvas');
+        const ctx = canvas.getContext('2d');
+        let currentImage = null;
+
+        // Meme templates
+        const templates = [
+            { name: 'Drake', url: '../../assets/meme-templates/drake.jpg' },
+            { name: 'Distracted Boyfriend', url: '../../assets/meme-templates/distracted-boyfriend.jpg' },
+            { name: 'Two Buttons', url: '../../assets/meme-templates/two-buttons.jpg' },
+            { name: 'Change My Mind', url: '../../assets/meme-templates/change-my-mind.jpg' },
+            { name: 'Expanding Brain', url: '../../assets/meme-templates/expanding-brain.jpg' },
+            { name: 'Woman Yelling at Cat', url: '../../assets/meme-templates/woman-yelling-cat.jpg' }
+        ];
+
+        // Load templates
+        function loadTemplates() {
+            const container = document.getElementById('templateContainer');
+            templates.forEach(template => {
+                const img = document.createElement('img');
+                img.src = template.url;
+                img.alt = template.name;
+                img.title = template.name;
+                img.className = 'template-preview';
+                img.onclick = () => loadTemplate(template.url);
+                container.appendChild(img);
+            });
+        }
+
+        // Load template
+        function loadTemplate(url) {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function() {
+                currentImage = img;
+                resetCanvas();
+                drawMeme();
+            };
+            img.src = url;
+        }
+
+        // Handle image upload
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        currentImage = img;
+                        resetCanvas();
+                        drawMeme();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Draw meme
+        function drawMeme() {
+            if (!currentImage) return;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate image dimensions
+            const ratio = Math.min(canvas.width / currentImage.width, canvas.height / currentImage.height);
+            const width = currentImage.width * ratio;
+            const height = currentImage.height * ratio;
+            const x = (canvas.width - width) / 2;
+            const y = (canvas.height - height) / 2;
+
+            // Draw image
+            ctx.drawImage(currentImage, x, y, width, height);
+
+            // Get text settings
+            const fontSize = document.getElementById('fontSize').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const textColor = document.getElementById('textColor').value;
+            const strokeColor = document.getElementById('strokeColor').value;
+            
+            // Configure text style
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.fillStyle = textColor;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = fontSize / 15;
+
+            // Draw top text
+            const topText = document.getElementById('topText').value.toUpperCase();
+            if (topText) {
+                ctx.fillStyle = textColor;
+                ctx.strokeText(topText, canvas.width/2, fontSize);
+                ctx.fillText(topText, canvas.width/2, fontSize);
+            }
+
+            // Draw bottom text
+            const bottomText = document.getElementById('bottomText').value.toUpperCase();
+            if (bottomText) {
+                ctx.fillStyle = textColor;
+                ctx.strokeText(bottomText, canvas.width/2, canvas.height - fontSize/2);
+                ctx.fillText(bottomText, canvas.width/2, canvas.height - fontSize/2);
+            }
+        }
+
+        // Reset canvas
+        function resetCanvas() {
+            if (currentImage) {
+                const ratio = Math.min(canvas.width / currentImage.width, canvas.height / currentImage.height);
+                const width = currentImage.width * ratio;
+                const height = currentImage.height * ratio;
+                canvas.width = width;
+                canvas.height = height;
+                drawMeme();
+            }
+        }
+
+        // Download meme
+        function downloadMeme(format) {
+            const link = document.createElement('a');
+            link.download = `meme.${format.toLowerCase()}`;
+            link.href = canvas.toDataURL(`image/${format.toLowerCase()}`);
+            link.click();
+        }
+
+        // Event listeners for text inputs and style controls
+        document.querySelectorAll('#topText, #bottomText').forEach(input => {
+            input.addEventListener('input', drawMeme);
+        });
+
+        document.querySelectorAll('#fontSize, #fontFamily, #textColor, #strokeColor').forEach(control => {
+            control.addEventListener('change', drawMeme);
+        });
+
+        // Initialize
+        loadTemplates();
+    </script>
+</body>
+</html> 

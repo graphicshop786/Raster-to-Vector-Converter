@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Sitemap Generator - Free Online Tools</title>
+    <meta name="description" content="Generate XML sitemaps for your website easily with our free online sitemap generator tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">XML Sitemap Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="sitemapForm">
+                            <div class="mb-3">
+                                <label for="websiteUrl" class="form-label">Website URL</label>
+                                <input type="url" class="form-control" id="websiteUrl" placeholder="https://example.com" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Crawl Options</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeImages" checked>
+                                    <label class="form-check-label" for="includeImages">Include Images</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeLastMod" checked>
+                                    <label class="form-check-label" for="includeLastMod">Include Last Modified Date</label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="maxPages" class="form-label">Maximum Pages to Crawl</label>
+                                <input type="number" class="form-control" id="maxPages" value="500" min="1" max="5000">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">Generate Sitemap</button>
+                        </form>
+                        
+                        <div id="loadingSpinner" class="text-center mt-4 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Crawling website and generating sitemap...</p>
+                        </div>
+                        
+                        <div id="result" class="mt-4 d-none">
+                            <h5>Generated Sitemap</h5>
+                            <div class="alert alert-success">
+                                <p>Your sitemap has been generated successfully!</p>
+                                <button class="btn btn-sm btn-success mt-2" id="downloadBtn">
+                                    <i class="fas fa-download"></i> Download Sitemap
+                                </button>
+                            </div>
+                            <pre class="bg-light p-3 rounded"><code id="sitemapOutput"></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        document.getElementById('sitemapForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const websiteUrl = document.getElementById('websiteUrl').value;
+            const includeImages = document.getElementById('includeImages').checked;
+            const includeLastMod = document.getElementById('includeLastMod').checked;
+            const maxPages = document.getElementById('maxPages').value;
+            
+            // Show loading spinner
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('result').classList.add('d-none');
+            
+            // Simulate sitemap generation (replace with actual crawling logic)
+            setTimeout(() => {
+                const sitemap = generateSampleSitemap(websiteUrl, includeImages, includeLastMod);
+                
+                // Hide loading spinner and show result
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('result').classList.remove('d-none');
+                
+                // Display sitemap
+                document.getElementById('sitemapOutput').textContent = sitemap;
+                
+                // Setup download button
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.onclick = () => {
+                    const blob = new Blob([sitemap], { type: 'text/xml' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'sitemap.xml';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                };
+            }, 2000);
+        });
+        
+        function generateSampleSitemap(websiteUrl, includeImages, includeLastMod) {
+            const date = new Date().toISOString();
+            let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${includeImages ? ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : ''}>
+    <url>
+        <loc>${websiteUrl}</loc>${includeLastMod ? `\n        <lastmod>${date}</lastmod>` : ''}
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>${includeImages ? `\n        <image:image>
+            <image:loc>${websiteUrl}/sample-image.jpg</image:loc>
+            <image:title>Sample Image</image:title>
+        </image:image>` : ''}
+    </url>
+    <url>
+        <loc>${websiteUrl}/about</loc>${includeLastMod ? `\n        <lastmod>${date}</lastmod>` : ''}
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>${websiteUrl}/contact</loc>${includeLastMod ? `\n        <lastmod>${date}</lastmod>` : ''}
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+</urlset>`;
+            return sitemap;
+        }
+    </script>
+</body>
+</html> 

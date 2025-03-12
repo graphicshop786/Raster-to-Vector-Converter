@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Scanner - Free Document Tools</title>
+    <meta name="description" content="Scan documents using your device's camera and convert them to PDF or images with our free online document scanner tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        #canvas {
+            display: none;
+        }
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid rgba(255,255,255,0.5);
+            pointer-events: none;
+        }
+        .camera-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .scan-item {
+            position: relative;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .scan-item img {
+            width: 100%;
+            height: auto;
+        }
+        .scan-item-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Document Scanner</h1>
+                <p class="lead">Scan documents using your device's camera</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- Camera View -->
+                    <div class="camera-container mb-4" id="cameraContainer">
+                        <video id="video" autoplay playsinline></video>
+                        <canvas id="canvas"></canvas>
+                        <div class="camera-overlay"></div>
+                        <div class="camera-controls">
+                            <button class="btn btn-light" id="switchCamera" title="Switch Camera">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" id="captureBtn">
+                                <i class="fas fa-camera me-2"></i>Capture
+                            </button>
+                            <button class="btn btn-light" id="torchBtn" title="Toggle Flash">
+                                <i class="fas fa-bolt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scanner Settings -->
+                    <div class="settings-panel mb-4">
+                        <h3 class="h5 mb-3">Scanner Settings</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Resolution</label>
+                                <select class="form-select" id="resolution">
+                                    <option value="high">High</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Color Mode</label>
+                                <select class="form-select" id="colorMode">
+                                    <option value="color">Color</option>
+                                    <option value="grayscale">Grayscale</option>
+                                    <option value="bw">Black & White</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Enhancement</label>
+                                <select class="form-select" id="enhancement">
+                                    <option value="none">None</option>
+                                    <option value="auto" selected>Auto Enhance</option>
+                                    <option value="high">High Contrast</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Format</label>
+                                <select class="form-select" id="format">
+                                    <option value="pdf">PDF</option>
+                                    <option value="jpg">JPG</option>
+                                    <option value="png">PNG</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scanned Images Preview -->
+                    <div class="preview-container mb-4" id="previewContainer" style="display: none;">
+                        <h3 class="h5 mb-3">Scanned Documents</h3>
+                        <div id="scanList"></div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="saveBtn" disabled>
+                            <i class="fas fa-save me-2"></i>Save Document
+                        </button>
+                        <button class="btn btn-outline-secondary" id="clearBtn" disabled>
+                            <i class="fas fa-trash me-2"></i>Clear All
+                        </button>
+                    </div>
+
+                    <!-- File Upload Fallback -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Camera not working?</p>
+                        <button class="btn btn-outline-primary" id="uploadBtn">
+                            <i class="fas fa-upload me-2"></i>Upload Images
+                        </button>
+                        <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">How to Use</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li>Allow camera access when prompted</li>
+                                <li>Position your document within the frame</li>
+                                <li>Click the capture button to scan</li>
+                                <li>Adjust settings for better results</li>
+                                <li>Save your scanned document</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- OpenCV.js for image processing -->
+    <script src="https://docs.opencv.org/4.5.4/opencv.js" async></script>
+    
+    <!-- html2pdf.js for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/document-tools/document-scanner.js"></script>
+</body>
+</html> 

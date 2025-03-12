@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Geolocation Finder - Free Online Tools</title>
+    <meta name="description" content="Find detailed geolocation information for any IP address including country, city, coordinates, ISP, and timezone.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 5px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+        .ip-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">IP Geolocation Finder</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- IP Input Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="ipInput" class="form-label">Enter IP Address:</label>
+                            <div class="input-group">
+                                <input type="text" id="ipInput" class="form-control" placeholder="Enter IP address (e.g., 8.8.8.8)" aria-label="IP address input">
+                                <button class="btn btn-primary" onclick="lookupIP()" aria-label="Lookup IP">
+                                    <i class="fas fa-search"></i> Lookup
+                                </button>
+                            </div>
+                            <div class="form-text">Leave empty to lookup your own IP address</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div id="results" style="display: none;">
+                    <!-- Map -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+
+                    <!-- IP Information -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">IP Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">IP Address:</span>
+                                    <div id="ipAddress"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">Country:</span>
+                                    <div id="country"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">Region:</span>
+                                    <div id="region"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">City:</span>
+                                    <div id="city"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">Postal Code:</span>
+                                    <div id="postalCode"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">Timezone:</span>
+                                    <div id="timezone"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">Coordinates:</span>
+                                    <div id="coordinates"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <span class="info-label">ISP:</span>
+                                    <div id="isp"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Lookups</h5>
+                        <div class="ip-history list-group" id="ipHistory"></div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About IP Geolocation</h5>
+                        <p>IP Geolocation is the process of determining the geographic location of an IP address. This tool provides:</p>
+                        <ul class="mb-0">
+                            <li>Physical location (country, region, city)</li>
+                            <li>Geographic coordinates</li>
+                            <li>Internet Service Provider (ISP) information</li>
+                            <li>Timezone details</li>
+                            <li>Visual map representation</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> Note: IP geolocation data is approximate and may not always reflect the exact physical location.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+        
+    <script>
+        // IP history
+        let ipHistory = [];
+        const MAX_HISTORY = 5;
+        let map = null;
+        let marker = null;
+
+        // Initialize map
+        function initMap(lat, lon) {
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView([lat, lon], 13);
+            }
+
+            if (marker) {
+                marker.remove();
+            }
+            marker = L.marker([lat, lon]).addTo(map);
+        }
+
+        // Lookup IP
+        async function lookupIP(ip = '') {
+            const ipInput = ip || document.getElementById('ipInput').value;
+            const apiUrl = `https://ipapi.co/${ipInput}/json/`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.reason || 'Invalid IP address');
+                }
+
+                // Update UI
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('ipAddress').textContent = data.ip;
+                document.getElementById('country').textContent = `${data.country_name} (${data.country})`;
+                document.getElementById('region').textContent = data.region;
+                document.getElementById('city').textContent = data.city;
+                document.getElementById('postalCode').textContent = data.postal || 'N/A';
+                document.getElementById('timezone').textContent = data.timezone;
+                document.getElementById('coordinates').textContent = `${data.latitude}, ${data.longitude}`;
+                document.getElementById('isp').textContent = data.org || 'N/A';
+
+                // Initialize map
+                initMap(data.latitude, data.longitude);
+
+                // Add to history
+                addToHistory(data);
+            } catch (error) {
+                alert('Error looking up IP: ' + error.message);
+            }
+        }
+
+        // Add to history
+        function addToHistory(data) {
+            ipHistory.unshift({
+                ip: data.ip,
+                location: `${data.city}, ${data.country}`,
+                timestamp: new Date()
+            });
+            if (ipHistory.length > MAX_HISTORY) {
+                ipHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('ipHistory');
+            historyContainer.innerHTML = '';
+            
+            ipHistory.forEach(item => {
+                const element = document.createElement('button');
+                element.className = 'list-group-item list-group-item-action history-item';
+                element.onclick = () => {
+                    document.getElementById('ipInput').value = item.ip;
+                    lookupIP(item.ip);
+                };
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.ip}</strong>
+                            <br>
+                            <small class="text-muted">${item.location}</small>
+                        </div>
+                        <small class="text-muted">${item.timestamp.toLocaleTimeString()}</small>
+                    </div>
+                `;
+                historyContainer.appendChild(element);
+            });
+        }
+
+        // Handle Enter key
+        document.getElementById('ipInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                lookupIP();
+            }
+        });
+
+        // Initial lookup (user's IP)
+        lookupIP();
+    </script>
+</body>
+</html> 

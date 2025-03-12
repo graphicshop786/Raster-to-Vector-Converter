@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generator - Free Document Tools</title>
+    <meta name="description" content="Convert text, images, and other files to PDF format easily with our free online PDF generator tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .drop-zone.dragover {
+            border-color: #0d6efd;
+            background: #e9ecef;
+        }
+        .preview-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background: white;
+        }
+        .file-item i {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        .file-item .file-info {
+            flex-grow: 1;
+        }
+        .file-item .file-actions {
+            margin-left: 1rem;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>PDF Generator</h1>
+                <p class="lead">Convert your files to PDF format easily</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- File Upload Area -->
+                    <div class="drop-zone mb-4" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                        <h3 class="h5">Drag & Drop Files Here</h3>
+                        <p class="text-muted mb-3">or</p>
+                        <button class="btn btn-primary" id="browseBtn">
+                            <i class="fas fa-folder-open me-2"></i>Browse Files
+                        </button>
+                        <input type="file" id="fileInput" multiple accept=".txt,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+
+                    <!-- PDF Settings -->
+                    <div class="settings-panel mb-4">
+                        <h3 class="h5 mb-3">PDF Settings</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Page Size</label>
+                                <select class="form-select" id="pageSize">
+                                    <option value="a4">A4</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="legal">Legal</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Orientation</label>
+                                <select class="form-select" id="orientation">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Margin</label>
+                                <select class="form-select" id="margin">
+                                    <option value="0">None</option>
+                                    <option value="0.5" selected>Normal</option>
+                                    <option value="1">Large</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quality</label>
+                                <select class="form-select" id="quality">
+                                    <option value="0.7">Draft</option>
+                                    <option value="0.85" selected>Normal</option>
+                                    <option value="1">High</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Preview -->
+                    <div class="preview-container mb-4" id="previewContainer" style="display: none;">
+                        <h3 class="h5 mb-3">Selected Files</h3>
+                        <div id="fileList"></div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="generateBtn" disabled>
+                            <i class="fas fa-file-pdf me-2"></i>Generate PDF
+                        </button>
+                        <button class="btn btn-outline-secondary" id="clearBtn" disabled>
+                            <i class="fas fa-trash me-2"></i>Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="row mt-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">How to Use</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li>Drag and drop files or click the browse button to select files</li>
+                                <li>Supported file types: Images (JPG, PNG), Documents (DOC, DOCX, TXT), Spreadsheets (XLS, XLSX)</li>
+                                <li>Adjust PDF settings according to your needs</li>
+                                <li>Click "Generate PDF" to convert your files</li>
+                                <li>Download the generated PDF file</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- html2pdf.js for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/document-tools/pdf-generator.js"></script>
+</body>
+</html> 

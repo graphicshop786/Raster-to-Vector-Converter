@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percentage Calculator - Calculate Percentages and Percentage Changes</title>
+    <meta name="description" content="Free online tool to calculate percentages, percentage changes, and percentage differences. Simple and easy to use.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Percentage Calculator</h1>
+                <p class="lead">Calculate percentages and percentage changes</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-4">
+                        <h3>What is X% of Y?</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="percentage" class="form-label">Percentage (X):</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="percentage" placeholder="Enter percentage">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="value" class="form-label">Value (Y):</label>
+                                <input type="number" class="form-control" id="value" placeholder="Enter value">
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" onclick="calculatePercentage()">
+                                    <i class="fas fa-calculator me-2"></i>Calculate
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info" id="percentage-result"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3>X is what percent of Y?</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="value1" class="form-label">Value (X):</label>
+                                <input type="number" class="form-control" id="value1" placeholder="Enter first value">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="value2" class="form-label">Value (Y):</label>
+                                <input type="number" class="form-control" id="value2" placeholder="Enter second value">
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" onclick="calculateWhatPercent()">
+                                    <i class="fas fa-calculator me-2"></i>Calculate
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info" id="what-percent-result"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3>Percentage Change</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="old-value" class="form-label">Old Value:</label>
+                                <input type="number" class="form-control" id="old-value" placeholder="Enter old value">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="new-value" class="form-label">New Value:</label>
+                                <input type="number" class="form-control" id="new-value" placeholder="Enter new value">
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" onclick="calculatePercentageChange()">
+                                    <i class="fas fa-calculator me-2"></i>Calculate
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info" id="change-result"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Percentage Calculations</h3>
+                    <p>This calculator helps you with three common percentage calculations:</p>
+                    <ul>
+                        <li>Finding a percentage of a number (e.g., 15% of 200)</li>
+                        <li>Finding what percentage one number is of another (e.g., 30 is what percent of 150)</li>
+                        <li>Calculating percentage change between two numbers (e.g., price increase/decrease)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Percentage Calculator Tool JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize result displays
+            document.getElementById('percentage-result').style.display = 'none';
+            document.getElementById('what-percent-result').style.display = 'none';
+            document.getElementById('change-result').style.display = 'none';
+        });
+
+        function calculatePercentage() {
+            const percentage = parseFloat(document.getElementById('percentage').value);
+            const value = parseFloat(document.getElementById('value').value);
+            const result = document.getElementById('percentage-result');
+
+            if (isNaN(percentage) || isNaN(value)) {
+                result.textContent = 'Please enter valid numbers';
+                result.style.display = 'block';
+                return;
+            }
+
+            const calculated = (percentage / 100) * value;
+            result.textContent = `${percentage}% of ${value} is ${calculated.toFixed(2)}`;
+            result.style.display = 'block';
+        }
+
+        function calculateWhatPercent() {
+            const value1 = parseFloat(document.getElementById('value1').value);
+            const value2 = parseFloat(document.getElementById('value2').value);
+            const result = document.getElementById('what-percent-result');
+
+            if (isNaN(value1) || isNaN(value2)) {
+                result.textContent = 'Please enter valid numbers';
+                result.style.display = 'block';
+                return;
+            }
+
+            if (value2 === 0) {
+                result.textContent = 'Cannot calculate percentage when second value is zero';
+                result.style.display = 'block';
+                return;
+            }
+
+            const calculated = (value1 / value2) * 100;
+            result.textContent = `${value1} is ${calculated.toFixed(2)}% of ${value2}`;
+            result.style.display = 'block';
+        }
+
+        function calculatePercentageChange() {
+            const oldValue = parseFloat(document.getElementById('old-value').value);
+            const newValue = parseFloat(document.getElementById('new-value').value);
+            const result = document.getElementById('change-result');
+
+            if (isNaN(oldValue) || isNaN(newValue)) {
+                result.textContent = 'Please enter valid numbers';
+                result.style.display = 'block';
+                return;
+            }
+
+            if (oldValue === 0) {
+                result.textContent = 'Cannot calculate percentage change when old value is zero';
+                result.style.display = 'block';
+                return;
+            }
+
+            const change = ((newValue - oldValue) / oldValue) * 100;
+            const direction = change >= 0 ? 'increased' : 'decreased';
+            result.textContent = `The value has ${direction} by ${Math.abs(change).toFixed(2)}%`;
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html> 

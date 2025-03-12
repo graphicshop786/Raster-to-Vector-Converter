@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robots.txt Generator - Create SEO-friendly Robots.txt Files</title>
+    <meta name="description" content="Free online tool to generate optimized robots.txt files for your website. Create SEO-friendly rules for search engine crawlers.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Robots.txt Generator</h1>
+                <p class="lead">Create SEO-friendly robots.txt files</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="sitemap-url" class="form-label">Sitemap URL:</label>
+                        <input type="url" class="form-control" id="sitemap-url" placeholder="https://example.com/sitemap.xml">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Crawler Rules:</label>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="allow-all" checked>
+                                        <label class="form-check-label" for="allow-all">
+                                            Allow all crawlers
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="disallow-admin">
+                                        <label class="form-check-label" for="disallow-admin">
+                                            Disallow admin area
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="disallow-login">
+                                        <label class="form-check-label" for="disallow-login">
+                                            Disallow login pages
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="disallow-cgi">
+                                        <label class="form-check-label" for="disallow-cgi">
+                                            Disallow CGI scripts
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="disallow-tmp">
+                                        <label class="form-check-label" for="disallow-tmp">
+                                            Disallow temporary files
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="custom-rules" class="form-label">Custom Rules:</label>
+                        <textarea class="form-control" id="custom-rules" rows="4" placeholder="Add custom rules (one per line)"></textarea>
+                        <div class="form-text">Format: Allow: /path or Disallow: /path</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="crawl-delay" class="form-label">Crawl Delay (seconds):</label>
+                        <input type="number" class="form-control" id="crawl-delay" min="0" value="0">
+                        <div class="form-text">Set to 0 to remove crawl delay</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="generated-robots" class="form-label">Generated Robots.txt:</label>
+                        <textarea class="form-control font-monospace" id="generated-robots" rows="12" readonly></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="generateRobots()">
+                            <i class="fas fa-code me-2"></i>Generate Robots.txt
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyRobots()">
+                            <i class="fas fa-copy me-2"></i>Copy to Clipboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Robots.txt</h3>
+                    <p>Robots.txt is a text file that tells search engine crawlers which pages or files they can or can't access. Common uses include:</p>
+                    <ul>
+                        <li>Preventing duplicate content indexing</li>
+                        <li>Protecting sensitive areas of your site</li>
+                        <li>Managing server load</li>
+                        <li>Controlling search engine crawling</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Note: While robots.txt can prevent crawling, it cannot prevent indexing of already crawled pages. Use meta robots tags for that purpose.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Robots.txt Generator Tool JavaScript
+        function generateRobots() {
+            let robots = '';
+
+            // Add sitemap if provided
+            const sitemapUrl = document.getElementById('sitemap-url').value;
+            if (sitemapUrl) {
+                robots += `Sitemap: ${sitemapUrl}\n\n`;
+            }
+
+            // Add user-agent and rules
+            robots += 'User-agent: *\n';
+
+            // Add crawl delay if specified
+            const crawlDelay = document.getElementById('crawl-delay').value;
+            if (crawlDelay > 0) {
+                robots += `Crawl-delay: ${crawlDelay}\n`;
+            }
+
+            // Add standard rules based on checkboxes
+            if (document.getElementById('disallow-admin').checked) {
+                robots += 'Disallow: /admin/\n';
+                robots += 'Disallow: /administrator/\n';
+                robots += 'Disallow: /wp-admin/\n';
+            }
+
+            if (document.getElementById('disallow-login').checked) {
+                robots += 'Disallow: /login/\n';
+                robots += 'Disallow: /wp-login.php\n';
+                robots += 'Disallow: /signin/\n';
+            }
+
+            if (document.getElementById('disallow-cgi').checked) {
+                robots += 'Disallow: /cgi-bin/\n';
+                robots += 'Disallow: /*.cgi\n';
+                robots += 'Disallow: /*.php\n';
+            }
+
+            if (document.getElementById('disallow-tmp').checked) {
+                robots += 'Disallow: /tmp/\n';
+                robots += 'Disallow: /temp/\n';
+                robots += 'Disallow: /cache/\n';
+            }
+
+            // Add custom rules
+            const customRules = document.getElementById('custom-rules').value;
+            if (customRules.trim()) {
+                robots += '\n' + customRules;
+            }
+
+            // If allow-all is checked, add Allow: /
+            if (document.getElementById('allow-all').checked) {
+                robots += '\nAllow: /\n';
+            }
+
+            document.getElementById('generated-robots').value = robots;
+        }
+
+        function copyRobots() {
+            const generatedRobots = document.getElementById('generated-robots');
+            generatedRobots.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function clearForm() {
+            document.getElementById('sitemap-url').value = '';
+            document.getElementById('allow-all').checked = true;
+            document.getElementById('disallow-admin').checked = false;
+            document.getElementById('disallow-login').checked = false;
+            document.getElementById('disallow-cgi').checked = false;
+            document.getElementById('disallow-tmp').checked = false;
+            document.getElementById('custom-rules').value = '';
+            document.getElementById('crawl-delay').value = '0';
+            document.getElementById('generated-robots').value = '';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Minifier - Free Online Tools</title>
+    <meta name="description" content="Minify CSS code to reduce file size with our free online minifier tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">CSS Minifier</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="css-input" class="form-label">Input CSS:</label>
+                            <textarea id="css-input" class="form-control code-editor" rows="10"></textarea>
+                        </div>
+                        <div class="mb-3 text-center">
+                            <button id="minify-btn" class="btn btn-primary me-2">
+                                <i class="fas fa-compress-alt"></i> Minify CSS
+                            </button>
+                            <button id="copy-btn" class="btn btn-success">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="css-output" class="form-label">Minified CSS:</label>
+                            <textarea id="css-output" class="form-control code-editor" rows="10" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clean-css/5.3.2/clean-css.min.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Initialize CodeMirror editors
+        const inputEditor = CodeMirror.fromTextArea(document.getElementById('css-input'), {
+            mode: 'css',
+            theme: 'monokai',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4
+        });
+
+        const outputEditor = CodeMirror.fromTextArea(document.getElementById('css-output'), {
+            mode: 'css',
+            theme: 'monokai',
+            lineNumbers: true,
+            readOnly: true,
+            indentUnit: 4
+        });
+
+        // Minify CSS
+        document.getElementById('minify-btn').addEventListener('click', () => {
+            try {
+                const input = inputEditor.getValue();
+                const cleanCSS = new CleanCSS({
+                    format: 'keep-breaks',
+                    level: {
+                        1: {
+                            all: true
+                        },
+                        2: {
+                            all: true
+                        }
+                    }
+                });
+                const minified = cleanCSS.minify(input);
+                outputEditor.setValue(minified.styles);
+            } catch (error) {
+                outputEditor.setValue('Error minifying CSS:\n' + error.message);
+            }
+        });
+
+        // Copy to clipboard
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = outputEditor.getValue();
+            navigator.clipboard.writeText(output).then(() => {
+                alert('Copied to clipboard!');
+            });
+        });
+    </script>
+</body>
+</html> 

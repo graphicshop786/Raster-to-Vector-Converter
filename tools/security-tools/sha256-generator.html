@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA256 Hash Generator - Free Online Tools</title>
+    <meta name="description" content="Generate SHA256 hash from text or files. Secure and reliable SHA256 hash calculation tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .hash-output {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .hash-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">SHA256 Hash Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Hash Generator Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Text Input -->
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label">Enter Text:</label>
+                            <textarea id="textInput" class="form-control" rows="4" placeholder="Enter text to generate SHA256 hash"></textarea>
+                        </div>
+
+                        <!-- File Input -->
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Or Upload a File:</label>
+                            <input type="file" id="fileInput" class="form-control" aria-label="Upload file for hashing">
+                        </div>
+
+                        <!-- Hash Output -->
+                        <div class="mb-3">
+                            <label for="hashOutput" class="form-label">SHA256 Hash:</label>
+                            <div class="input-group">
+                                <input type="text" id="hashOutput" class="form-control hash-output" readonly aria-label="Generated SHA256 hash">
+                                <button class="btn btn-primary" onclick="copyHash()" aria-label="Copy hash">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="upperCase" checked>
+                                <label class="form-check-label" for="upperCase">
+                                    Uppercase Output
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="liveUpdate" checked>
+                                <label class="form-check-label" for="liveUpdate">
+                                    Live Update
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success w-100" onclick="generateHash()" aria-label="Generate hash">
+                            <i class="fas fa-shield-alt"></i> Generate Hash
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hash History -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Hashes</h5>
+                        <div class="hash-history list-group" id="hashHistory"></div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About SHA256 Hash</h5>
+                        <p>SHA-256 (Secure Hash Algorithm 256-bit) is a cryptographic hash function that produces a fixed-size 256-bit (32-byte) hash value. It's widely used for:</p>
+                        <ul class="mb-0">
+                            <li>Digital signatures</li>
+                            <li>Blockchain and cryptocurrency</li>
+                            <li>Password hashing</li>
+                            <li>Data integrity verification</li>
+                            <li>SSL/TLS certificates</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> SHA-256 is considered cryptographically secure and is recommended for security-critical applications.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CryptoJS for SHA256 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Hash history
+        let hashHistory = [];
+        const MAX_HISTORY = 5;
+
+        // Generate hash from text
+        function generateHash() {
+            const text = document.getElementById('textInput').value;
+            if (!text) return;
+
+            const hash = CryptoJS.SHA256(text).toString();
+            updateHashOutput(hash);
+            addToHistory(text, hash);
+        }
+
+        // Generate hash from file
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const hash = CryptoJS.SHA256(e.target.result).toString();
+                updateHashOutput(hash);
+                addToHistory(file.name, hash);
+            };
+            reader.readAsBinaryString(file);
+        });
+
+        // Update hash output
+        function updateHashOutput(hash) {
+            const upperCase = document.getElementById('upperCase').checked;
+            document.getElementById('hashOutput').value = upperCase ? hash.toUpperCase() : hash.toLowerCase();
+        }
+
+        // Add to history
+        function addToHistory(input, hash) {
+            hashHistory.unshift({
+                input: input.length > 30 ? input.substring(0, 30) + '...' : input,
+                hash: hash,
+                timestamp: new Date()
+            });
+            if (hashHistory.length > MAX_HISTORY) {
+                hashHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('hashHistory');
+            historyContainer.innerHTML = '';
+            
+            hashHistory.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'list-group-item history-item';
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${item.input}</small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('${item.hash}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="mt-1">${item.hash}</div>
+                `;
+                historyContainer.appendChild(element);
+            });
+        }
+
+        // Copy hash
+        function copyHash() {
+            const hash = document.getElementById('hashOutput').value;
+            if (!hash) return;
+            copyToClipboard(hash);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Hash copied to clipboard!');
+            });
+        }
+
+        // Live update
+        document.getElementById('textInput').addEventListener('input', function() {
+            if (document.getElementById('liveUpdate').checked) {
+                generateHash();
+            }
+        });
+
+        // Toggle case
+        document.getElementById('upperCase').addEventListener('change', function() {
+            const hash = document.getElementById('hashOutput').value;
+            if (hash) {
+                updateHashOutput(hash);
+            }
+        });
+    </script>
+</body>
+</html> 

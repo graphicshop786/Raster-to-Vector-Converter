@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Minifier - Compress JS Code</title>
+    <meta name="description" content="Free online tool to minify and compress JavaScript code. Reduce file size while maintaining functionality.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>JavaScript Minifier</h1>
+                <p class="lead">Compress your JavaScript code</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="js-input" class="form-label">Input JavaScript:</label>
+                        <textarea class="form-control font-monospace" id="js-input" rows="12" placeholder="Paste your JavaScript code here..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remove-comments" checked>
+                            <label class="form-check-label" for="remove-comments">
+                                Remove comments
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remove-whitespace" checked>
+                            <label class="form-check-label" for="remove-whitespace">
+                                Remove unnecessary whitespace
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remove-semicolons" checked>
+                            <label class="form-check-label" for="remove-semicolons">
+                                Remove unnecessary semicolons
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="mangle-variables" checked>
+                            <label class="form-check-label" for="mangle-variables">
+                                Mangle variable names
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-primary w-100" onclick="minifyJS()">
+                            <i class="fas fa-compress-alt me-2"></i>Minify JavaScript
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Compression Stats</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p class="mb-1">Original Size: <span id="original-size">0</span> bytes</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1">Minified Size: <span id="minified-size">0</span> bytes</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1">Savings: <span id="savings">0</span>%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="minified-output" class="form-label">Minified JavaScript:</label>
+                        <textarea class="form-control font-monospace" id="minified-output" rows="12" readonly></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary" onclick="copyMinified()">
+                            <i class="fas fa-copy me-2"></i>Copy Minified JS
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About JavaScript Minification</h3>
+                    <p>JavaScript minification is the process of removing unnecessary characters from JS code to reduce file size. Benefits include:</p>
+                    <ul>
+                        <li>Faster page load times</li>
+                        <li>Reduced bandwidth usage</li>
+                        <li>Better caching</li>
+                        <li>Improved website performance</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Note: Always keep a backup of your original JavaScript file. Minified code is harder to read and debug.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // JavaScript Minifier Tool JavaScript
+        function minifyJS() {
+            let js = document.getElementById('js-input').value;
+            const removeComments = document.getElementById('remove-comments').checked;
+            const removeWhitespace = document.getElementById('remove-whitespace').checked;
+            const removeSemicolons = document.getElementById('remove-semicolons').checked;
+            const mangleVariables = document.getElementById('mangle-variables').checked;
+
+            // Store original size
+            const originalSize = js.length;
+            document.getElementById('original-size').textContent = originalSize;
+
+            // Remove comments
+            if (removeComments) {
+                // Remove single-line comments
+                js = js.replace(/\/\/.*/g, '');
+                // Remove multi-line comments
+                js = js.replace(/\/\*[\s\S]*?\*\//g, '');
+            }
+
+            // Remove unnecessary whitespace
+            if (removeWhitespace) {
+                // Remove whitespace around operators
+                js = js.replace(/\s*([\{\}\[\]\(\):;,])\s*/g, '$1');
+                // Remove whitespace before and after statements
+                js = js.replace(/\s*([\{\}])\s*/g, '$1');
+                // Remove whitespace around operators
+                js = js.replace(/\s*([+\-*/%=<>!&|^~?:])\s*/g, '$1');
+                // Remove multiple spaces
+                js = js.replace(/\s+/g, ' ');
+                // Remove whitespace at the start and end of statements
+                js = js.replace(/\s*;\s*/g, ';');
+            }
+
+            // Remove unnecessary semicolons
+            if (removeSemicolons) {
+                js = js.replace(/;}/g, '}');
+                js = js.replace(/;(\s*[}\]])/g, '$1');
+            }
+
+            // Mangle variable names (simple version)
+            if (mangleVariables) {
+                const varRegex = /\b(var|let|const)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
+                const variables = new Set();
+                let match;
+
+                // Collect all variable names
+                while ((match = varRegex.exec(js)) !== null) {
+                    variables.add(match[2]);
+                }
+
+                // Create a mapping of original names to mangled names
+                const nameMap = new Map();
+                const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                let counter = 0;
+
+                variables.forEach(name => {
+                    if (name.length > 2) { // Only mangle names longer than 2 characters
+                        let newName = '';
+                        let num = counter;
+                        do {
+                            newName = chars[num % chars.length] + newName;
+                            num = Math.floor(num / chars.length);
+                        } while (num > 0);
+                        nameMap.set(name, newName);
+                        counter++;
+                    }
+                });
+
+                // Replace variable names
+                nameMap.forEach((newName, oldName) => {
+                    const regex = new RegExp(`\\b${oldName}\\b`, 'g');
+                    js = js.replace(regex, newName);
+                });
+            }
+
+            // Update minified output
+            document.getElementById('minified-output').value = js;
+
+            // Calculate and display stats
+            const minifiedSize = js.length;
+            const savings = ((originalSize - minifiedSize) / originalSize * 100).toFixed(1);
+            
+            document.getElementById('minified-size').textContent = minifiedSize;
+            document.getElementById('savings').textContent = savings;
+        }
+
+        function copyMinified() {
+            const minifiedOutput = document.getElementById('minified-output');
+            minifiedOutput.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function clearForm() {
+            document.getElementById('js-input').value = '';
+            document.getElementById('remove-comments').checked = true;
+            document.getElementById('remove-whitespace').checked = true;
+            document.getElementById('remove-semicolons').checked = true;
+            document.getElementById('mangle-variables').checked = true;
+            document.getElementById('minified-output').value = '';
+            document.getElementById('original-size').textContent = '0';
+            document.getElementById('minified-size').textContent = '0';
+            document.getElementById('savings').textContent = '0';
+        }
+    </script>
+</body>
+</html> 

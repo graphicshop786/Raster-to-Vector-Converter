@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator - Free Document Tools</title>
+    <meta name="description" content="Free online invoice generator. Create professional invoices, customize details, and download as PDF.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .invoice-preview {
+            background-color: #fff;
+            padding: 30px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .invoice-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .invoice-table th {
+            background-color: #f8f9fa;
+        }
+        .invoice-total {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .form-section {
+            margin-bottom: 25px;
+        }
+        .form-section-title {
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        #items-container .row {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Invoice Generator</h1>
+                <p class="lead">Create professional invoices in minutes</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="row">
+                    <!-- Invoice Form -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Invoice Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="invoice-form">
+                                    <!-- Invoice Info -->
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Invoice Information</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="invoice-number" class="form-label">Invoice #</label>
+                                                <input type="text" class="form-control" id="invoice-number" value="INV-001">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="invoice-date" class="form-label">Date</label>
+                                                <input type="date" class="form-control" id="invoice-date">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="due-date" class="form-label">Due Date</label>
+                                                <input type="date" class="form-control" id="due-date">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="currency" class="form-label">Currency</label>
+                                                <select class="form-select" id="currency">
+                                                    <option value="$">USD ($)</option>
+                                                    <option value="€">EUR (€)</option>
+                                                    <option value="£">GBP (£)</option>
+                                                    <option value="¥">JPY (¥)</option>
+                                                    <option value="₹">INR (₹)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Your Info -->
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Your Information</h6>
+                                        <div class="mb-3">
+                                            <label for="from-name" class="form-label">Your Name/Company</label>
+                                            <input type="text" class="form-control" id="from-name" placeholder="Your Company Name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="from-address" class="form-label">Your Address</label>
+                                            <textarea class="form-control" id="from-address" rows="3" placeholder="Your complete address"></textarea>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="from-email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="from-email" placeholder="your@email.com">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="from-phone" class="form-label">Phone</label>
+                                                <input type="text" class="form-control" id="from-phone" placeholder="Your phone number">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Client Info -->
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Client Information</h6>
+                                        <div class="mb-3">
+                                            <label for="to-name" class="form-label">Client Name/Company</label>
+                                            <input type="text" class="form-control" id="to-name" placeholder="Client Company Name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="to-address" class="form-label">Client Address</label>
+                                            <textarea class="form-control" id="to-address" rows="3" placeholder="Client's complete address"></textarea>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="to-email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="to-email" placeholder="client@email.com">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="to-phone" class="form-label">Phone</label>
+                                                <input type="text" class="form-control" id="to-phone" placeholder="Client's phone number">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Invoice Items -->
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Invoice Items</h6>
+                                        <div id="items-container">
+                                            <!-- Items will be added here -->
+                                            <div class="row item-row">
+                                                <div class="col-md-5 mb-2">
+                                                    <input type="text" class="form-control item-description" placeholder="Item description">
+                                                </div>
+                                                <div class="col-md-2 mb-2">
+                                                    <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <input type="number" class="form-control item-price" placeholder="Price" value="0.00" step="0.01" min="0">
+                                                </div>
+                                                <div class="col-md-2 mb-2">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-item" aria-label="Remove item"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" id="add-item" class="btn btn-sm btn-secondary mt-2">
+                                            <i class="fas fa-plus me-1"></i> Add Item
+                                        </button>
+                                    </div>
+
+                                    <!-- Notes -->
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Additional Information</h6>
+                                        <div class="mb-3">
+                                            <label for="notes" class="form-label">Notes</label>
+                                            <textarea class="form-control" id="notes" rows="3" placeholder="Payment terms, thank you note, etc."></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Preview -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Preview</h5>
+                                <button id="download-pdf" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-download me-1"></i> Download PDF
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="invoice-preview" class="invoice-preview">
+                                    <!-- Preview will be generated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">How to Use</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Fill in your business details on the left</li>
+                            <li>Enter your client's information</li>
+                            <li>Add invoice items with descriptions, quantities, and prices</li>
+                            <li>Include any additional notes or payment terms</li>
+                            <li>Preview your invoice on the right</li>
+                            <li>Click "Download PDF" to save your invoice</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default dates
+            const today = new Date();
+            const dueDate = new Date();
+            dueDate.setDate(today.getDate() + 30); // Due in 30 days
+            
+            document.getElementById('invoice-date').valueAsDate = today;
+            document.getElementById('due-date').valueAsDate = dueDate;
+            
+            // Add item button
+            document.getElementById('add-item').addEventListener('click', function() {
+                addNewItem();
+                updatePreview();
+            });
+            
+            // Remove item button
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-item') || e.target.parentElement.classList.contains('remove-item')) {
+                    const button = e.target.closest('.remove-item');
+                    const row = button.closest('.item-row');
+                    
+                    // Don't remove if it's the only item
+                    const itemRows = document.querySelectorAll('.item-row');
+                    if (itemRows.length > 1) {
+                        row.remove();
+                        updatePreview();
+                    } else {
+                        alert('You need at least one item on the invoice.');
+                    }
+                }
+            });
+            
+            // Update preview on input change
+            const form = document.getElementById('invoice-form');
+            form.addEventListener('input', updatePreview);
+            
+            // Download PDF button
+            document.getElementById('download-pdf').addEventListener('click', generatePDF);
+            
+            // Initial preview
+            updatePreview();
+            
+            // Functions
+            function addNewItem() {
+                const itemsContainer = document.getElementById('items-container');
+                const newRow = document.createElement('div');
+                newRow.className = 'row item-row';
+                newRow.innerHTML = `
+                    <div class="col-md-5 mb-2">
+                        <input type="text" class="form-control item-description" placeholder="Item description">
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="number" class="form-control item-price" placeholder="Price" value="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <button type="button" class="btn btn-danger btn-sm remove-item" aria-label="Remove item"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                itemsContainer.appendChild(newRow);
+            }
+            
+            function updatePreview() {
+                const preview = document.getElementById('invoice-preview');
+                const currency = document.getElementById('currency').value;
+                
+                // Calculate totals
+                let subtotal = 0;
+                const items = [];
+                
+                document.querySelectorAll('.item-row').forEach(row => {
+                    const description = row.querySelector('.item-description').value || 'Item description';
+                    const quantity = parseInt(row.querySelector('.item-quantity').value) || 0;
+                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                    const total = quantity * price;
+                    
+                    subtotal += total;
+                    
+                    items.push({
+                        description,
+                        quantity,
+                        price,
+                        total
+                    });
+                });
+                
+                const tax = subtotal * 0.1; // 10% tax
+                const total = subtotal + tax;
+                
+                // Generate HTML
+                preview.innerHTML = `
+                    <div class="invoice-header d-flex justify-content-between">
+                        <div>
+                            <h4>INVOICE</h4>
+                            <p class="mb-0">${document.getElementById('invoice-number').value || 'INV-001'}</p>
+                        </div>
+                        <div class="text-end">
+                            <p class="mb-0"><strong>Date:</strong> ${formatDate(document.getElementById('invoice-date').value)}</p>
+                            <p class="mb-0"><strong>Due Date:</strong> ${formatDate(document.getElementById('due-date').value)}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h6>From:</h6>
+                            <p class="mb-0">${document.getElementById('from-name').value || 'Your Company'}</p>
+                            <p class="mb-0">${document.getElementById('from-address').value || 'Your Address'}</p>
+                            <p class="mb-0">${document.getElementById('from-email').value || 'your@email.com'}</p>
+                            <p class="mb-0">${document.getElementById('from-phone').value || 'Your Phone'}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h6>To:</h6>
+                            <p class="mb-0">${document.getElementById('to-name').value || 'Client Name'}</p>
+                            <p class="mb-0">${document.getElementById('to-address').value || 'Client Address'}</p>
+                            <p class="mb-0">${document.getElementById('to-email').value || 'client@email.com'}</p>
+                            <p class="mb-0">${document.getElementById('to-phone').value || 'Client Phone'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <table class="table invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map(item => `
+                                    <tr>
+                                        <td>${item.description}</td>
+                                        <td class="text-center">${item.quantity}</td>
+                                        <td class="text-end">${currency}${item.price.toFixed(2)}</td>
+                                        <td class="text-end">${currency}${item.total.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="invoice-total">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-0">${document.getElementById('notes').value || 'Thank you for your business!'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless text-end">
+                                    <tr>
+                                        <td>Subtotal:</td>
+                                        <td>${currency}${subtotal.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tax (10%):</td>
+                                        <td>${currency}${tax.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total:</strong></td>
+                                        <td><strong>${currency}${total.toFixed(2)}</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            
+            function generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const preview = document.getElementById('invoice-preview');
+                
+                // Create a clone of the preview to modify for PDF
+                const printElement = preview.cloneNode(true);
+                document.body.appendChild(printElement);
+                printElement.style.width = '210mm';
+                printElement.style.padding = '20mm';
+                printElement.style.position = 'absolute';
+                printElement.style.left = '-9999px';
+                
+                html2canvas(printElement, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                }).then(canvas => {
+                    document.body.removeChild(printElement);
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                    const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                    const imgY = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                    pdf.save(`Invoice-${document.getElementById('invoice-number').value || 'INV-001'}.pdf`);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

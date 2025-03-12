@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy Generator - Free Online Tools</title>
+    <meta name="description" content="Generate a comprehensive privacy policy for your website or app with our free Privacy Policy Generator tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .policy-preview {
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .policy-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background-color: #f8f9fa;
+        }
+        .form-section {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Privacy Policy Generator</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Generator Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form id="policyForm" onsubmit="generatePolicy(event)">
+                            <!-- Basic Information -->
+                            <div class="form-section">
+                                <h5>Basic Information</h5>
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">Company/Website Name:</label>
+                                    <input type="text" class="form-control" id="companyName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="websiteUrl" class="form-label">Website URL:</label>
+                                    <input type="url" class="form-control" id="websiteUrl" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contactEmail" class="form-label">Contact Email:</label>
+                                    <input type="email" class="form-control" id="contactEmail" required>
+                                </div>
+                            </div>
+
+                            <!-- Data Collection -->
+                            <div class="form-section">
+                                <h5>Data Collection</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">What personal data do you collect?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="collectName">
+                                        <label class="form-check-label" for="collectName">Names</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="collectEmail">
+                                        <label class="form-check-label" for="collectEmail">Email Addresses</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="collectPhone">
+                                        <label class="form-check-label" for="collectPhone">Phone Numbers</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="collectAddress">
+                                        <label class="form-check-label" for="collectAddress">Physical Addresses</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="collectPayment">
+                                        <label class="form-check-label" for="collectPayment">Payment Information</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cookies -->
+                            <div class="form-section">
+                                <h5>Cookies & Tracking</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">What cookies and tracking do you use?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useAnalytics">
+                                        <label class="form-check-label" for="useAnalytics">Analytics (e.g., Google Analytics)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useAdvertising">
+                                        <label class="form-check-label" for="useAdvertising">Advertising Cookies</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useFunctional">
+                                        <label class="form-check-label" for="useFunctional">Functional Cookies</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Third-Party Services -->
+                            <div class="form-section">
+                                <h5>Third-Party Services</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Which third-party services do you use?</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="usePaymentProcessors">
+                                        <label class="form-check-label" for="usePaymentProcessors">Payment Processors</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useEmailMarketing">
+                                        <label class="form-check-label" for="useEmailMarketing">Email Marketing Services</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useSocialMedia">
+                                        <label class="form-check-label" for="useSocialMedia">Social Media Integration</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Options -->
+                            <div class="form-section">
+                                <h5>Additional Options</h5>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="isGDPRCompliant">
+                                        <label class="form-check-label" for="isGDPRCompliant">Include GDPR Compliance</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="isCCPACompliant">
+                                        <label class="form-check-label" for="isCCPACompliant">Include CCPA Compliance</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-alt"></i> Generate Privacy Policy
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Preview Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Preview</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary me-2" onclick="copyPolicy()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="downloadPolicy()">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div id="policyPreview" class="policy-preview bg-light p-3 rounded"></div>
+                    </div>
+                </div>
+
+                <!-- Generation History -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Generations</h5>
+                        <div class="policy-history list-group" id="policyHistory"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About Privacy Policy Generator</h5>
+                        <p>Our Privacy Policy Generator helps you create a comprehensive privacy policy for your website or application:</p>
+                        <ul class="mb-0">
+                            <li>Customizable to your specific needs</li>
+                            <li>GDPR and CCPA compliance options</li>
+                            <li>Clear and professional language</li>
+                            <li>Regular updates to match current regulations</li>
+                            <li>Easy to download and implement</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> Note: While this generator creates a solid foundation for your privacy policy, we recommend having it reviewed by a legal professional to ensure it meets all your specific requirements.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Policy history
+        let policyHistory = [];
+        const MAX_HISTORY = 5;
+
+        // Generate privacy policy
+        function generatePolicy(event) {
+            event.preventDefault();
+            
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                websiteUrl: document.getElementById('websiteUrl').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                collectName: document.getElementById('collectName').checked,
+                collectEmail: document.getElementById('collectEmail').checked,
+                collectPhone: document.getElementById('collectPhone').checked,
+                collectAddress: document.getElementById('collectAddress').checked,
+                collectPayment: document.getElementById('collectPayment').checked,
+                useAnalytics: document.getElementById('useAnalytics').checked,
+                useAdvertising: document.getElementById('useAdvertising').checked,
+                useFunctional: document.getElementById('useFunctional').checked,
+                usePaymentProcessors: document.getElementById('usePaymentProcessors').checked,
+                useEmailMarketing: document.getElementById('useEmailMarketing').checked,
+                useSocialMedia: document.getElementById('useSocialMedia').checked,
+                isGDPRCompliant: document.getElementById('isGDPRCompliant').checked,
+                isCCPACompliant: document.getElementById('isCCPACompliant').checked
+            };
+
+            const policy = generatePolicyText(formData);
+            document.getElementById('policyPreview').textContent = policy;
+            
+            addToHistory(formData);
+        }
+
+        // Generate policy text
+        function generatePolicyText(data) {
+            let policy = `Privacy Policy for ${data.companyName}
+
+Last updated: ${new Date().toLocaleDateString()}
+
+This Privacy Policy describes how ${data.companyName} ("we", "us", or "our") collects, uses, and discloses your personal information when you visit ${data.websiteUrl} (the "Website").
+
+Information We Collect\n`;
+
+            // Personal Information Section
+            let collectedData = [];
+            if (data.collectName) collectedData.push("names");
+            if (data.collectEmail) collectedData.push("email addresses");
+            if (data.collectPhone) collectedData.push("phone numbers");
+            if (data.collectAddress) collectedData.push("physical addresses");
+            if (data.collectPayment) collectedData.push("payment information");
+
+            if (collectedData.length > 0) {
+                policy += `\nWe collect the following types of personal information: ${collectedData.join(", ")}.`;
+            }
+
+            // Cookies Section
+            if (data.useAnalytics || data.useAdvertising || data.useFunctional) {
+                policy += "\n\nCookies and Tracking\nWe use cookies and similar tracking technologies to:";
+                if (data.useAnalytics) policy += "\n- Analyze how you use our website through analytics services";
+                if (data.useAdvertising) policy += "\n- Deliver targeted advertising";
+                if (data.useFunctional) policy += "\n- Enable website functionality";
+            }
+
+            // Third-Party Services
+            if (data.usePaymentProcessors || data.useEmailMarketing || data.useSocialMedia) {
+                policy += "\n\nThird-Party Services\nWe may use third-party services for:";
+                if (data.usePaymentProcessors) policy += "\n- Processing payments";
+                if (data.useEmailMarketing) policy += "\n- Email marketing";
+                if (data.useSocialMedia) policy += "\n- Social media integration";
+            }
+
+            // GDPR Compliance
+            if (data.isGDPRCompliant) {
+                policy += `\n\nGDPR Compliance
+If you are a resident of the European Economic Area (EEA), you have certain data protection rights. We aim to take reasonable steps to allow you to correct, amend, delete, or limit the use of your Personal Information.
+
+Your data protection rights under GDPR include:
+- The right to access, update or delete your information
+- The right of rectification
+- The right to object
+- The right of restriction
+- The right to data portability
+- The right to withdraw consent`;
+            }
+
+            // CCPA Compliance
+            if (data.isCCPACompliant) {
+                policy += `\n\nCCPA Privacy Rights (Do Not Sell My Personal Information)
+Under the CCPA, California consumers have the right to:
+- Request that a business delete any personal data about the consumer that a business has collected
+- Request that a business that sells a consumer's personal data, not sell the consumer's personal data
+- Access their personal data
+- Know whether their personal data is sold or disclosed and to whom`;
+            }
+
+            // Contact Information
+            policy += `\n\nContact Us
+If you have any questions about this Privacy Policy, please contact us at:
+Email: ${data.contactEmail}
+Website: ${data.websiteUrl}`;
+
+            return policy;
+        }
+
+        // Copy policy to clipboard
+        function copyPolicy() {
+            const policyText = document.getElementById('policyPreview').textContent;
+            navigator.clipboard.writeText(policyText).then(() => {
+                alert('Privacy Policy copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy policy: ' + err);
+            });
+        }
+
+        // Download policy as text file
+        function downloadPolicy() {
+            const policyText = document.getElementById('policyPreview').textContent;
+            const blob = new Blob([policyText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'privacy-policy.txt';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Add to history
+        function addToHistory(formData) {
+            policyHistory.unshift({
+                companyName: formData.companyName,
+                websiteUrl: formData.websiteUrl,
+                timestamp: new Date()
+            });
+            if (policyHistory.length > MAX_HISTORY) {
+                policyHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('policyHistory');
+            historyContainer.innerHTML = '';
+            
+            policyHistory.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'list-group-item history-item';
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.companyName}</strong>
+                            <br>
+                            <small class="text-muted">${item.websiteUrl}</small>
+                        </div>
+                        <small class="text-muted">${item.timestamp.toLocaleString()}</small>
+                    </div>
+                `;
+                element.onclick = () => {
+                    document.getElementById('companyName').value = item.companyName;
+                    document.getElementById('websiteUrl').value = item.websiteUrl;
+                    document.getElementById('policyForm').dispatchEvent(new Event('submit'));
+                };
+                historyContainer.appendChild(element);
+            });
+        }
+    </script>
+</body>
+</html> 

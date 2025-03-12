@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Base64 Converter - Convert Images to Base64</title>
+    <meta name="description" content="Free online tool to convert images to Base64 format. Generate data URLs for embedding images in HTML, CSS, or JavaScript.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Image to Base64 Converter</h1>
+                <p class="lead">Convert images to Base64 data URLs</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="tool-form">
+                    <div class="mb-3">
+                        <label for="image-input" class="form-label">Select Image:</label>
+                        <input type="file" class="form-control" id="image-input" accept="image/*">
+                        <div class="form-text">Supported formats: JPG, PNG, GIF, WebP</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Image Information</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p class="mb-1">File Size: <span id="file-size">-</span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1">Dimensions: <span id="dimensions">-</span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="mb-1">Format: <span id="format">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Original Image</h5>
+                                <div class="image-preview-container">
+                                    <img id="preview" class="img-fluid" alt="Image preview">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Output Format</h5>
+                                <div class="btn-group w-100 mb-3">
+                                    <button class="btn btn-outline-secondary active" onclick="setOutputFormat('dataURL')" aria-label="Set output format to Data URL">Data URL</button>
+                                    <button class="btn btn-outline-secondary" onclick="setOutputFormat('base64')" aria-label="Set output format to Base64 only">Base64 Only</button>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="wrap-text" checked>
+                                    <label class="form-check-label" for="wrap-text">
+                                        Word wrap output
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="output" class="form-label">Base64 Output:</label>
+                        <textarea class="form-control font-monospace" id="output" rows="10" readonly></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>HTML Usage Example:</h5>
+                        <textarea class="form-control font-monospace" id="html-example" rows="3" readonly></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>CSS Usage Example:</h5>
+                        <textarea class="form-control font-monospace" id="css-example" rows="3" readonly></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="convertToBase64()">
+                            <i class="fas fa-code me-2"></i>Convert to Base64
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyOutput()">
+                            <i class="fas fa-copy me-2"></i>Copy Output
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Base64 Image Conversion</h3>
+                    <p>Base64 encoding allows you to embed images directly in your code. Benefits include:</p>
+                    <ul>
+                        <li>Reduce HTTP requests</li>
+                        <li>Embed images in CSS/HTML</li>
+                        <li>Create self-contained documents</li>
+                        <li>Avoid cross-origin issues</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Note: Base64 encoding increases file size by approximately 33%. Use it for small images only.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Image to Base64 Converter Tool JavaScript
+        let currentImage = null;
+        let outputFormat = 'dataURL';
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        document.getElementById('image-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                currentImage = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        document.getElementById('preview').src = e.target.result;
+                        document.getElementById('file-size').textContent = formatFileSize(file.size);
+                        document.getElementById('dimensions').textContent = `${img.width} × ${img.height}`;
+                        document.getElementById('format').textContent = file.type.split('/')[1].toUpperCase();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file.');
+            }
+        });
+
+        function setOutputFormat(format) {
+            outputFormat = format;
+            document.querySelectorAll('.btn-group button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            if (currentImage) convertToBase64();
+        }
+
+        function convertToBase64() {
+            if (!currentImage) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let output = e.target.result;
+                if (outputFormat === 'base64') {
+                    output = output.split(',')[1];
+                }
+
+                const wrapText = document.getElementById('wrap-text').checked;
+                document.getElementById('output').value = wrapText ? 
+                    output.match(/.{1,76}/g).join('\n') : output;
+
+                // Update examples
+                document.getElementById('html-example').value = 
+                    `<img src="${e.target.result}" alt="Base64 encoded image">`;
+                
+                document.getElementById('css-example').value = 
+                    `.element {\n    background-image: url(${e.target.result});\n}`;
+            };
+            reader.readAsDataURL(currentImage);
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function clearForm() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('preview').src = '';
+            document.getElementById('output').value = '';
+            document.getElementById('html-example').value = '';
+            document.getElementById('css-example').value = '';
+            document.getElementById('file-size').textContent = '-';
+            document.getElementById('dimensions').textContent = '-';
+            document.getElementById('format').textContent = '-';
+            currentImage = null;
+        }
+    </script>
+</body>
+</html> 

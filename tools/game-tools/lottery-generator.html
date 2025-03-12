@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lottery Number Generator - Free Online Tools</title>
+    <meta name="description" content="Generate random lottery numbers for various lottery games with our free online lottery number generator.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .lottery-ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            margin: 5px;
+            animation: popIn 0.5s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .history-item {
+            transition: transform 0.2s;
+        }
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+        .powerball {
+            background: linear-gradient(135deg, #ff0000, #ff6b6b);
+        }
+        .mega {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        }
+        .bonus {
+            background: linear-gradient(135deg, #FFC107, #FFE082);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Lottery Number Generator</h1>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Number Generator -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Generate Numbers</h5>
+                        
+                        <!-- Game Selection -->
+                        <div class="mb-4">
+                            <label for="gameType" class="form-label">Select Lottery Game</label>
+                            <select class="form-select" id="gameType">
+                                <option value="powerball">Powerball (5/69 + 1/26)</option>
+                                <option value="mega">Mega Millions (5/70 + 1/25)</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+
+                        <!-- Custom Range Options (hidden by default) -->
+                        <div id="customOptions" class="mb-4" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="mainNumbers" class="form-label">Main Numbers to Pick</label>
+                                    <input type="number" class="form-control" id="mainNumbers" value="5" min="1" max="10">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="mainRange" class="form-label">Main Numbers Range</label>
+                                    <input type="number" class="form-control" id="mainRange" value="50" min="1" max="99">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="bonusNumbers" class="form-label">Bonus Numbers to Pick</label>
+                                    <input type="number" class="form-control" id="bonusNumbers" value="1" min="0" max="5">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bonusRange" class="form-label">Bonus Numbers Range</label>
+                                    <input type="number" class="form-control" id="bonusRange" value="10" min="1" max="99">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Number Display -->
+                        <div class="text-center mb-4">
+                            <div id="numberDisplay" class="d-flex flex-wrap justify-content-center align-items-center">
+                                <!-- Numbers will be displayed here -->
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="generateNumbers()">
+                                <i class="fas fa-random"></i> Generate Numbers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Pick Options -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Quick Pick Options</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-primary w-100 mb-2" onclick="quickPick('powerball')">
+                                    Powerball
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-success w-100 mb-2" onclick="quickPick('mega')">
+                                    Mega Millions
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-warning w-100 mb-2" onclick="quickPick('euro')">
+                                    EuroMillions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Number History -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Numbers</h5>
+                        <div id="numberHistory" class="list-group">
+                            <!-- History items will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">About Lottery Generator</h5>
+                        <p>Generate random lottery numbers:</p>
+                        <ul class="mb-0">
+                            <li>Popular lottery game formats</li>
+                            <li>Custom number ranges</li>
+                            <li>Quick pick options</li>
+                            <li>Save recent number sets</li>
+                        </ul>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> Numbers are generated randomly and do not guarantee winning.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Game configurations
+        const games = {
+            powerball: { main: { count: 5, range: 69 }, bonus: { count: 1, range: 26 } },
+            mega: { main: { count: 5, range: 70 }, bonus: { count: 1, range: 25 } },
+            euro: { main: { count: 5, range: 50 }, bonus: { count: 2, range: 12 } }
+        };
+
+        // Generate random number
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Generate unique random numbers
+        function generateUniqueNumbers(count, max) {
+            const numbers = new Set();
+            while(numbers.size < count) {
+                numbers.add(getRandomNumber(1, max));
+            }
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        // Create number ball element
+        function createBall(number, type = '') {
+            const ball = document.createElement('div');
+            ball.className = `lottery-ball ${type}`;
+            ball.textContent = number.toString().padStart(2, '0');
+            return ball;
+        }
+
+        // Generate numbers based on selected game
+        function generateNumbers() {
+            const display = document.getElementById('numberDisplay');
+            display.innerHTML = '';
+            
+            let mainCount, mainRange, bonusCount, bonusRange;
+            const gameType = document.getElementById('gameType').value;
+
+            if (gameType === 'custom') {
+                mainCount = parseInt(document.getElementById('mainNumbers').value);
+                mainRange = parseInt(document.getElementById('mainRange').value);
+                bonusCount = parseInt(document.getElementById('bonusNumbers').value);
+                bonusRange = parseInt(document.getElementById('bonusRange').value);
+            } else {
+                const game = games[gameType];
+                mainCount = game.main.count;
+                mainRange = game.main.range;
+                bonusCount = game.bonus.count;
+                bonusRange = game.bonus.range;
+            }
+
+            // Generate main numbers
+            const mainNumbers = generateUniqueNumbers(mainCount, mainRange);
+            mainNumbers.forEach(num => {
+                display.appendChild(createBall(num));
+            });
+
+            // Generate bonus numbers
+            if (bonusCount > 0) {
+                const bonusNumbers = generateUniqueNumbers(bonusCount, bonusRange);
+                bonusNumbers.forEach(num => {
+                    display.appendChild(createBall(num, 'bonus'));
+                });
+            }
+
+            // Add to history
+            addToHistory(gameType, mainNumbers, bonusNumbers);
+        }
+
+        // Quick pick for specific game
+        function quickPick(game) {
+            document.getElementById('gameType').value = game;
+            generateNumbers();
+        }
+
+        // Add numbers to history
+        function addToHistory(gameType, mainNumbers, bonusNumbers) {
+            const history = document.getElementById('numberHistory');
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item list-group-item list-group-item-action';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const numbers = mainNumbers.map(n => n.toString().padStart(2, '0')).join(', ');
+            const bonus = bonusNumbers.map(n => n.toString().padStart(2, '0')).join(', ');
+            
+            historyItem.innerHTML = `
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">${gameType.charAt(0).toUpperCase() + gameType.slice(1)}</h6>
+                    <small>${timestamp}</small>
+                </div>
+                <p class="mb-1">Numbers: ${numbers}</p>
+                ${bonus ? `<small>Bonus: ${bonus}</small>` : ''}
+            `;
+
+            // Keep only last 5 items
+            if (history.children.length >= 5) {
+                history.removeChild(history.lastChild);
+            }
+            history.insertBefore(historyItem, history.firstChild);
+        }
+
+        // Toggle custom options
+        document.getElementById('gameType').addEventListener('change', function() {
+            const customOptions = document.getElementById('customOptions');
+            customOptions.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        // Initialize with Powerball numbers
+        generateNumbers();
+    </script>
+</body>
+</html> 

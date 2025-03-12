@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Converter - Free Online Tools</title>
+    <meta name="description" content="Convert between different speed units including kilometers per hour, miles per hour, meters per second, knots, and more with our free online Speed Converter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="converter-style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Speed Converter</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="converter-container">
+                            <div class="input-group mb-3">
+                                <input type="number" id="fromValue" class="form-control" placeholder="Enter value" aria-label="Enter value to convert">
+                                <select id="fromUnit" class="form-select" aria-label="Select source unit">
+                                    <option value="kph">Kilometers per hour (km/h)</option>
+                                    <option value="mph">Miles per hour (mph)</option>
+                                    <option value="mps">Meters per second (m/s)</option>
+                                    <option value="fps">Feet per second (ft/s)</option>
+                                    <option value="knot">Knots</option>
+                                    <option value="mach">Mach</option>
+                                    <option value="kps">Kilometers per second (km/s)</option>
+                                    <option value="lightspeed">Speed of Light (c)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <button class="btn btn-primary" onclick="swapUnits()">
+                                    <i class="fas fa-exchange-alt"></i> Swap
+                                </button>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <input type="number" id="toValue" class="form-control" readonly aria-label="Converted value">
+                                <select id="toUnit" class="form-select" aria-label="Select target unit">
+                                    <option value="mph">Miles per hour (mph)</option>
+                                    <option value="kph">Kilometers per hour (km/h)</option>
+                                    <option value="mps">Meters per second (m/s)</option>
+                                    <option value="fps">Feet per second (ft/s)</option>
+                                    <option value="knot">Knots</option>
+                                    <option value="mach">Mach</option>
+                                    <option value="kps">Kilometers per second (km/s)</option>
+                                    <option value="lightspeed">Speed of Light (c)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-success" onclick="copyResult()">
+                                    <i class="fas fa-copy"></i> Copy Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Conversions -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Common Speed Conversions</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Formula</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Kilometers per hour</td>
+                                        <td>Miles per hour</td>
+                                        <td>km/h × 0.621371</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Miles per hour</td>
+                                        <td>Meters per second</td>
+                                        <td>mph × 0.44704</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Knots</td>
+                                        <td>Kilometers per hour</td>
+                                        <td>knots × 1.852</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Meters per second</td>
+                                        <td>Kilometers per hour</td>
+                                        <td>m/s × 3.6</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Constants
+        const SPEED_OF_LIGHT = 299792458; // meters per second
+        const MACH_1 = 343; // meters per second at sea level, 20°C
+
+        // Convert to meters per second first, then to target unit
+        function convertToMPS(value, fromUnit) {
+            switch(fromUnit) {
+                case 'mps':
+                    return value;
+                case 'kph':
+                    return value * (1000 / 3600);
+                case 'mph':
+                    return value * 0.44704;
+                case 'fps':
+                    return value * 0.3048;
+                case 'knot':
+                    return value * 0.514444;
+                case 'mach':
+                    return value * MACH_1;
+                case 'kps':
+                    return value * 1000;
+                case 'lightspeed':
+                    return value * SPEED_OF_LIGHT;
+                default:
+                    return value;
+            }
+        }
+
+        function convertFromMPS(value, toUnit) {
+            switch(toUnit) {
+                case 'mps':
+                    return value;
+                case 'kph':
+                    return value * 3.6;
+                case 'mph':
+                    return value * 2.23694;
+                case 'fps':
+                    return value * 3.28084;
+                case 'knot':
+                    return value * 1.94384;
+                case 'mach':
+                    return value / MACH_1;
+                case 'kps':
+                    return value / 1000;
+                case 'lightspeed':
+                    return value / SPEED_OF_LIGHT;
+                default:
+                    return value;
+            }
+        }
+
+        // Convert function
+        function convert() {
+            const fromValue = parseFloat(document.getElementById('fromValue').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            
+            if (isNaN(fromValue)) {
+                document.getElementById('toValue').value = '';
+                return;
+            }
+            
+            // Convert to meters per second first, then to target unit
+            const mps = convertToMPS(fromValue, fromUnit);
+            const result = convertFromMPS(mps, toUnit);
+            
+            // Use scientific notation for very small or large numbers
+            document.getElementById('toValue').value = result.toExponential(6);
+        }
+
+        // Swap units function
+        function swapUnits() {
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            const fromValue = document.getElementById('fromValue');
+            const toValue = document.getElementById('toValue');
+            
+            [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+            
+            if (fromValue.value !== '') {
+                convert();
+            }
+        }
+
+        // Copy result function
+        function copyResult() {
+            const toValue = document.getElementById('toValue');
+            const toUnit = document.getElementById('toUnit');
+            
+            if (toValue.value === '') return;
+            
+            const textToCopy = `${toValue.value} ${toUnit.options[toUnit.selectedIndex].text}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Result copied to clipboard!');
+            });
+        }
+
+        // Add event listeners
+        document.getElementById('fromValue').addEventListener('input', convert);
+        document.getElementById('fromUnit').addEventListener('change', convert);
+        document.getElementById('toUnit').addEventListener('change', convert);
+    </script>
+</body>
+</html> 

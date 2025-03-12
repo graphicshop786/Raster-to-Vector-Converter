@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator - Advanced Math Functions</title>
+    <meta name="description" content="Free online scientific calculator with advanced mathematical functions, trigonometry, logarithms, and more.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .calculator-btn {
+            width: 100%;
+            height: 50px;
+            margin: 2px;
+            font-size: 1.2rem;
+        }
+        .display {
+            font-family: monospace;
+            font-size: 1.5rem;
+            text-align: right;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .history-display {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #6c757d;
+            min-height: 24px;
+        }
+        .function-btn {
+            background-color: #e9ecef;
+        }
+        .number-btn {
+            background-color: #ffffff;
+        }
+        .operator-btn {
+            background-color: #f8f9fa;
+        }
+        .equals-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .memory-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header">
+                <h1>Scientific Calculator</h1>
+                <p class="lead">Advanced mathematical calculations</p>
+            </div>
+
+            <!-- Ad Section - Top -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+
+            <div class="tool-content">
+                <div class="calculator">
+                    <div class="mb-3">
+                        <div class="history-display" id="history"></div>
+                        <div class="display" id="display">0</div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="btn-group w-100">
+                                <button class="btn memory-btn calculator-btn" onclick="memoryOperation('MC')">MC</button>
+                                <button class="btn memory-btn calculator-btn" onclick="memoryOperation('MR')">MR</button>
+                                <button class="btn memory-btn calculator-btn" onclick="memoryOperation('M+')">M+</button>
+                                <button class="btn memory-btn calculator-btn" onclick="memoryOperation('M-')">M-</button>
+                                <button class="btn memory-btn calculator-btn" onclick="memoryOperation('MS')">MS</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn-group w-100">
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('sin')">sin</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('cos')">cos</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('tan')">tan</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('log')">log</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('ln')">ln</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn-group w-100">
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('sqrt')">√</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertOperator('^')">x<sup>y</sup></button>
+                                <button class="btn function-btn calculator-btn" onclick="insertFunction('abs')">|x|</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertConstant('π')">π</button>
+                                <button class="btn function-btn calculator-btn" onclick="insertConstant('e')">e</button>
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('7')">7</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('8')">8</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('9')">9</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('4')">4</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('5')">5</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('6')">6</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('1')">1</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('2')">2</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('3')">3</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertNumber('0')">0</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="insertDecimal()">.</button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn number-btn calculator-btn" onclick="toggleSign()">±</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <button class="btn operator-btn calculator-btn" onclick="clearDisplay()">C</button>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn operator-btn calculator-btn" onclick="insertOperator('/')">/</button>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn operator-btn calculator-btn" onclick="insertOperator('*')">×</button>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn operator-btn calculator-btn" onclick="insertOperator('-')">-</button>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn operator-btn calculator-btn" onclick="insertOperator('+')">+</button>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn equals-btn calculator-btn" onclick="calculate()">=</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-info mt-4">
+                    <h3>About Scientific Calculator</h3>
+                    <p>This scientific calculator provides advanced mathematical functions including:</p>
+                    <ul>
+                        <li>Trigonometric functions (sin, cos, tan)</li>
+                        <li>Logarithmic functions (log, ln)</li>
+                        <li>Power and root functions</li>
+                        <li>Constants (π, e)</li>
+                        <li>Memory operations</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tip: Use the memory buttons to store and recall frequently used values.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section - Bottom -->
+            <div class="ad-container text-center mb-4">
+                <div class="ad-placeholder">
+                    <p>Advertisement Space</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Scientific Calculator Tool JavaScript
+        let currentValue = '0';
+        let memory = 0;
+        let lastOperation = '';
+        let newNumber = true;
+        let decimalAdded = false;
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = currentValue;
+        }
+
+        function insertNumber(num) {
+            if (newNumber) {
+                currentValue = num;
+                newNumber = false;
+            } else {
+                currentValue = currentValue === '0' ? num : currentValue + num;
+            }
+            updateDisplay();
+        }
+
+        function insertDecimal() {
+            if (!decimalAdded) {
+                if (newNumber) {
+                    currentValue = '0.';
+                    newNumber = false;
+                } else {
+                    currentValue += '.';
+                }
+                decimalAdded = true;
+                updateDisplay();
+            }
+        }
+
+        function toggleSign() {
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        function insertOperator(op) {
+            calculate();
+            lastOperation = currentValue + ' ' + op + ' ';
+            document.getElementById('history').textContent = lastOperation;
+            newNumber = true;
+            decimalAdded = false;
+        }
+
+        function insertFunction(func) {
+            switch(func) {
+                case 'sin':
+                    currentValue = Math.sin(parseFloat(currentValue) * Math.PI / 180).toString();
+                    break;
+                case 'cos':
+                    currentValue = Math.cos(parseFloat(currentValue) * Math.PI / 180).toString();
+                    break;
+                case 'tan':
+                    currentValue = Math.tan(parseFloat(currentValue) * Math.PI / 180).toString();
+                    break;
+                case 'log':
+                    currentValue = Math.log10(parseFloat(currentValue)).toString();
+                    break;
+                case 'ln':
+                    currentValue = Math.log(parseFloat(currentValue)).toString();
+                    break;
+                case 'sqrt':
+                    currentValue = Math.sqrt(parseFloat(currentValue)).toString();
+                    break;
+                case 'abs':
+                    currentValue = Math.abs(parseFloat(currentValue)).toString();
+                    break;
+            }
+            updateDisplay();
+            newNumber = true;
+            decimalAdded = false;
+        }
+
+        function insertConstant(constant) {
+            switch(constant) {
+                case 'π':
+                    currentValue = Math.PI.toString();
+                    break;
+                case 'e':
+                    currentValue = Math.E.toString();
+                    break;
+            }
+            updateDisplay();
+            newNumber = true;
+            decimalAdded = true;
+        }
+
+        function calculate() {
+            if (lastOperation) {
+                const expression = lastOperation + currentValue;
+                try {
+                    currentValue = eval(expression.replace('^', '**')).toString();
+                    document.getElementById('history').textContent = expression + ' =';
+                } catch (e) {
+                    currentValue = 'Error';
+                }
+                updateDisplay();
+                lastOperation = '';
+                newNumber = true;
+                decimalAdded = currentValue.includes('.');
+            }
+        }
+
+        function clearDisplay() {
+            currentValue = '0';
+            lastOperation = '';
+            document.getElementById('history').textContent = '';
+            newNumber = true;
+            decimalAdded = false;
+            updateDisplay();
+        }
+
+        function memoryOperation(op) {
+            const value = parseFloat(currentValue);
+            switch(op) {
+                case 'MC':
+                    memory = 0;
+                    break;
+                case 'MR':
+                    currentValue = memory.toString();
+                    updateDisplay();
+                    break;
+                case 'M+':
+                    memory += value;
+                    break;
+                case 'M-':
+                    memory -= value;
+                    break;
+                case 'MS':
+                    memory = value;
+                    break;
+            }
+            newNumber = true;
+            decimalAdded = false;
+        }
+
+        // Initialize calculator
+        updateDisplay();
+    </script>
+</body>
+</html> 

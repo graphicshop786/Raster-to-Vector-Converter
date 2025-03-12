@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Formatter - Free Online Tools</title>
+    <meta name="description" content="Format SQL queries for better readability with our free online SQL formatter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">SQL Formatter</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="sql-input" class="form-label">Input SQL:</label>
+                            <textarea id="sql-input" class="form-control code-editor" rows="10"></textarea>
+                        </div>
+                        <div class="mb-3 text-center">
+                            <button id="format-btn" class="btn btn-primary me-2">
+                                <i class="fas fa-code"></i> Format SQL
+                            </button>
+                            <button id="copy-btn" class="btn btn-success">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sql-output" class="form-label">Formatted SQL:</label>
+                            <textarea id="sql-output" class="form-control code-editor" rows="10" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/sql/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql-formatter/4.0.2/sql-formatter.min.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Initialize CodeMirror editors
+        const inputEditor = CodeMirror.fromTextArea(document.getElementById('sql-input'), {
+            mode: 'sql',
+            theme: 'monokai',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4
+        });
+
+        const outputEditor = CodeMirror.fromTextArea(document.getElementById('sql-output'), {
+            mode: 'sql',
+            theme: 'monokai',
+            lineNumbers: true,
+            readOnly: true,
+            indentUnit: 4
+        });
+
+        // Format SQL
+        document.getElementById('format-btn').addEventListener('click', () => {
+            try {
+                const input = inputEditor.getValue();
+                const formatted = sqlFormatter.format(input, {
+                    language: 'sql',
+                    indent: '    ',
+                    uppercase: true,
+                    linesBetweenQueries: 2
+                });
+                outputEditor.setValue(formatted);
+            } catch (error) {
+                outputEditor.setValue('Error formatting SQL:\n' + error.message);
+            }
+        });
+
+        // Copy to clipboard
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const output = outputEditor.getValue();
+            navigator.clipboard.writeText(output).then(() => {
+                alert('Copied to clipboard!');
+            });
+        });
+    </script>
+</body>
+</html> 

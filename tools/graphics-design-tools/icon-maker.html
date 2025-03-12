@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Maker - Free Graphics Design Tools</title>
+    <meta name="description" content="Create custom icons online. Choose from various shapes, styles, and colors to design professional icons for your projects.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background: #f8f9fa;
+        }
+        
+        .icon-preview {
+            width: 128px;
+            height: 128px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            margin: 0 auto;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+        
+        .shape-preset {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .shape-preset:hover {
+            transform: scale(1.1);
+        }
+        
+        .shape-preset.active {
+            border-color: #0d6efd;
+        }
+        
+        .icon-size-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .size-preview {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+        
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Icon Maker</h1>
+                <p class="lead">Create custom icons for your projects</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Icon Preview -->
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <div class="icon-preview" id="icon-preview">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="icon-size-preview mt-3">
+                                    <div class="size-preview" style="width: 16px; height: 16px">
+                                        <i class="fas fa-star" style="font-size: 8px"></i>
+                                    </div>
+                                    <div class="size-preview" style="width: 32px; height: 32px">
+                                        <i class="fas fa-star" style="font-size: 16px"></i>
+                                    </div>
+                                    <div class="size-preview" style="width: 64px; height: 64px">
+                                        <i class="fas fa-star" style="font-size: 32px"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Controls -->
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Icon Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label">Choose Icon</label>
+                                    <div class="input-group">
+                                        <input type="text" id="icon-search" class="form-control" placeholder="Search icons..." title="Search icons">
+                                        <button class="btn btn-outline-secondary" type="button" id="search-btn" title="Search">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div id="icon-results" class="mt-3 d-flex flex-wrap gap-2">
+                                        <!-- Icons will be loaded here -->
+                                    </div>
+                                </div>
+
+                                <!-- Shape Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label">Background Shape</label>
+                                    <div class="d-flex flex-wrap">
+                                        <div class="shape-preset active" data-shape="none" title="No background">
+                                            <i class="fas fa-ban"></i>
+                                        </div>
+                                        <div class="shape-preset" data-shape="square" title="Square background">
+                                            <i class="fas fa-square"></i>
+                                        </div>
+                                        <div class="shape-preset" data-shape="circle" title="Circle background">
+                                            <i class="fas fa-circle"></i>
+                                        </div>
+                                        <div class="shape-preset" data-shape="rounded" title="Rounded square background">
+                                            <i class="fas fa-square"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Colors -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Icon Color</label>
+                                        <div class="input-group">
+                                            <input type="color" id="icon-color" class="color-picker" value="#000000" title="Choose icon color">
+                                            <input type="text" id="icon-color-hex" class="form-control" value="#000000" title="Icon color hex code">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Background Color</label>
+                                        <div class="input-group">
+                                            <input type="color" id="bg-color" class="color-picker" value="#ffffff" title="Choose background color">
+                                            <input type="text" id="bg-color-hex" class="form-control" value="#ffffff" title="Background color hex code">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Size -->
+                                <div class="mb-4">
+                                    <label for="icon-size" class="form-label">Icon Size</label>
+                                    <input type="range" class="form-range" id="icon-size" min="20" max="100" value="50" title="Adjust icon size">
+                                </div>
+
+                                <!-- Rotation -->
+                                <div class="mb-4">
+                                    <label for="icon-rotation" class="form-label">Rotation</label>
+                                    <input type="range" class="form-range" id="icon-rotation" min="0" max="360" value="0" title="Adjust rotation">
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex gap-2">
+                                    <button id="reset-btn" class="btn btn-outline-secondary" title="Reset all settings">
+                                        <i class="fas fa-undo me-2"></i>Reset
+                                    </button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Download options">
+                                            <i class="fas fa-download me-2"></i>Download
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                                            <li><a class="dropdown-item" href="#" data-size="16">16x16 PNG</a></li>
+                                            <li><a class="dropdown-item" href="#" data-size="32">32x32 PNG</a></li>
+                                            <li><a class="dropdown-item" href="#" data-size="64">64x64 PNG</a></li>
+                                            <li><a class="dropdown-item" href="#" data-size="128">128x128 PNG</a></li>
+                                            <li><a class="dropdown-item" href="#" data-size="256">256x256 PNG</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Instructions -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">How to Use</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol class="mb-0">
+                                    <li>Search and select an icon</li>
+                                    <li>Choose a background shape</li>
+                                    <li>Customize colors for icon and background</li>
+                                    <li>Adjust size and rotation</li>
+                                    <li>Download in your preferred size</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Popular Icons -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Popular Icons</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-outline-secondary btn-sm" title="Home icon">
+                                        <i class="fas fa-home"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="User icon">
+                                        <i class="fas fa-user"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Settings icon">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Heart icon">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Star icon">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Check icon">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Search icon">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Bell icon">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div class="loading">
+        <div class="spinner-border text-primary spinner" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const iconPreview = document.getElementById('icon-preview');
+            const iconSearch = document.getElementById('icon-search');
+            const iconResults = document.getElementById('icon-results');
+            const iconColor = document.getElementById('icon-color');
+            const iconColorHex = document.getElementById('icon-color-hex');
+            const bgColor = document.getElementById('bg-color');
+            const bgColorHex = document.getElementById('bg-color-hex');
+            const iconSize = document.getElementById('icon-size');
+            const iconRotation = document.getElementById('icon-rotation');
+            const loading = document.querySelector('.loading');
+            
+            // Font Awesome icon categories
+            const iconCategories = {
+                'Basics': ['home', 'user', 'cog', 'heart', 'star', 'check', 'search', 'bell'],
+                'Communication': ['envelope', 'comment', 'phone', 'video', 'microphone'],
+                'Media': ['image', 'camera', 'play', 'music', 'film'],
+                'Navigation': ['arrow-left', 'arrow-right', 'arrow-up', 'arrow-down', 'bars'],
+                'Social': ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube']
+            };
+            
+            // Load initial icons
+            loadIcons('Basics');
+            
+            // Icon search
+            document.getElementById('search-btn').addEventListener('click', function() {
+                const query = iconSearch.value.toLowerCase();
+                let results = [];
+                
+                Object.values(iconCategories).forEach(category => {
+                    results = results.concat(category.filter(icon => 
+                        icon.toLowerCase().includes(query)
+                    ));
+                });
+                
+                displayIconResults(results);
+            });
+            
+            // Load icons by category
+            function loadIcons(category) {
+                const icons = iconCategories[category] || [];
+                displayIconResults(icons);
+            }
+            
+            // Display icon search results
+            function displayIconResults(icons) {
+                iconResults.innerHTML = icons.map(icon => `
+                    <button class="btn btn-outline-secondary" onclick="selectIcon('${icon}')" title="${icon} icon">
+                        <i class="fas fa-${icon}"></i>
+                    </button>
+                `).join('');
+            }
+            
+            // Select icon
+            window.selectIcon = function(icon) {
+                const iconElement = iconPreview.querySelector('i');
+                iconElement.className = `fas fa-${icon}`;
+                updateSizePreviews(icon);
+            };
+            
+            // Update size previews
+            function updateSizePreviews(icon) {
+                document.querySelectorAll('.size-preview i').forEach(preview => {
+                    preview.className = `fas fa-${icon}`;
+                });
+            }
+            
+            // Shape selection
+            document.querySelectorAll('.shape-preset').forEach(preset => {
+                preset.addEventListener('click', function() {
+                    document.querySelector('.shape-preset.active').classList.remove('active');
+                    this.classList.add('active');
+                    
+                    const shape = this.dataset.shape;
+                    iconPreview.style.borderRadius = 
+                        shape === 'circle' ? '50%' :
+                        shape === 'rounded' ? '16px' : '8px';
+                });
+            });
+            
+            // Color pickers
+            iconColor.addEventListener('input', function() {
+                iconColorHex.value = this.value;
+                iconPreview.querySelector('i').style.color = this.value;
+                updateSizePreviews();
+            });
+            
+            iconColorHex.addEventListener('input', function() {
+                iconColor.value = this.value;
+                iconPreview.querySelector('i').style.color = this.value;
+                updateSizePreviews();
+            });
+            
+            bgColor.addEventListener('input', function() {
+                bgColorHex.value = this.value;
+                iconPreview.style.backgroundColor = this.value;
+            });
+            
+            bgColorHex.addEventListener('input', function() {
+                bgColor.value = this.value;
+                iconPreview.style.backgroundColor = this.value;
+            });
+            
+            // Size slider
+            iconSize.addEventListener('input', function() {
+                iconPreview.querySelector('i').style.fontSize = `${this.value}px`;
+            });
+            
+            // Rotation slider
+            iconRotation.addEventListener('input', function() {
+                iconPreview.querySelector('i').style.transform = `rotate(${this.value}deg)`;
+            });
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                iconPreview.querySelector('i').className = 'fas fa-star';
+                iconPreview.style.borderRadius = '8px';
+                iconPreview.style.backgroundColor = '#ffffff';
+                iconPreview.querySelector('i').style.color = '#000000';
+                iconPreview.querySelector('i').style.fontSize = '64px';
+                iconPreview.querySelector('i').style.transform = 'rotate(0deg)';
+                
+                iconColor.value = '#000000';
+                iconColorHex.value = '#000000';
+                bgColor.value = '#ffffff';
+                bgColorHex.value = '#ffffff';
+                iconSize.value = 50;
+                iconRotation.value = 0;
+                
+                document.querySelector('.shape-preset.active').classList.remove('active');
+                document.querySelector('[data-shape="none"]').classList.add('active');
+                
+                updateSizePreviews('star');
+            });
+            
+            // Download
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const size = parseInt(this.dataset.size);
+                    downloadIcon(size);
+                });
+            });
+            
+            function downloadIcon(size) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = size;
+                canvas.height = size;
+                
+                // Draw background
+                ctx.fillStyle = bgColor.value;
+                if (document.querySelector('.shape-preset.active').dataset.shape === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(0, 0, size, size);
+                }
+                
+                // Draw icon
+                ctx.fillStyle = iconColor.value;
+                const fontSize = size * 0.6;
+                ctx.font = `${fontSize}px "Font Awesome 5 Free"`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const icon = iconPreview.querySelector('i').className.split(' ')[2].replace('fa-', '');
+                ctx.fillText(icon, size/2, size/2);
+                
+                // Download
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Popular icons
+            document.querySelectorAll('.card-body .btn-outline-secondary').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const icon = this.querySelector('i').className.split(' ')[2].replace('fa-', '');
+                    selectIcon(icon);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator - Free Online Tools</title>
+    <meta name="description" content="Generate hash values using multiple algorithms including MD5, SHA-1, SHA-256, SHA-512. Supports both text and file hashing.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .hash-output {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .hash-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .drag-drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        .drag-drop-zone.dragover {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Hash Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Text Hash Generator -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Text Hash Generator</h5>
+                        
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">Enter Text:</label>
+                            <textarea class="form-control" id="inputText" rows="3" placeholder="Enter text to hash" aria-label="Text to hash"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Hash Algorithm:</label>
+                            <div class="btn-group w-100" role="group" aria-label="Hash algorithm selection">
+                                <input type="radio" class="btn-check" name="algorithm" id="md5" value="MD5" checked>
+                                <label class="btn btn-outline-primary" for="md5">MD5</label>
+
+                                <input type="radio" class="btn-check" name="algorithm" id="sha1" value="SHA-1">
+                                <label class="btn btn-outline-primary" for="sha1">SHA-1</label>
+
+                                <input type="radio" class="btn-check" name="algorithm" id="sha256" value="SHA-256">
+                                <label class="btn btn-outline-primary" for="sha256">SHA-256</label>
+
+                                <input type="radio" class="btn-check" name="algorithm" id="sha512" value="SHA-512">
+                                <label class="btn btn-outline-primary" for="sha512">SHA-512</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hashOutput" class="form-label">Hash Output:</label>
+                            <div class="input-group">
+                                <input type="text" id="hashOutput" class="form-control hash-output" readonly aria-label="Generated hash">
+                                <button class="btn btn-primary" onclick="copyHash('hashOutput')" aria-label="Copy hash">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success w-100" onclick="generateTextHash()" aria-label="Generate hash">
+                            <i class="fas fa-calculator"></i> Generate Hash
+                        </button>
+                    </div>
+                </div>
+
+                <!-- File Hash Generator -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">File Hash Generator</h5>
+                        
+                        <div class="mb-3">
+                            <div id="dropZone" class="drag-drop-zone mb-3">
+                                <i class="fas fa-file-upload fa-2x mb-2"></i>
+                                <p class="mb-0">Drag and drop a file here or click to select</p>
+                                <input type="file" id="fileInput" class="d-none" aria-label="File input for hashing">
+                            </div>
+                            <div id="fileInfo" class="small text-muted"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fileHashOutput" class="form-label">File Hash:</label>
+                            <div class="input-group">
+                                <input type="text" id="fileHashOutput" class="form-control hash-output" readonly aria-label="Generated file hash">
+                                <button class="btn btn-primary" onclick="copyHash('fileHashOutput')" aria-label="Copy file hash">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hash History -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recent Hashes</h5>
+                        <div class="hash-history list-group" id="hashHistory"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Crypto JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script src="../../js/security-tools/hash-generator.js"></script>
+
+    <script>
+        // Hash history
+        let hashHistory = [];
+        const MAX_HISTORY = 5;
+
+        // Generate text hash
+        async function generateTextHash() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('Please enter text to hash');
+                return;
+            }
+
+            const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+            let hash = '';
+
+            switch(algorithm) {
+                case 'MD5':
+                    hash = CryptoJS.MD5(text).toString();
+                    break;
+                case 'SHA-1':
+                    hash = CryptoJS.SHA1(text).toString();
+                    break;
+                case 'SHA-256':
+                    hash = CryptoJS.SHA256(text).toString();
+                    break;
+                case 'SHA-512':
+                    hash = CryptoJS.SHA512(text).toString();
+                    break;
+            }
+
+            document.getElementById('hashOutput').value = hash;
+            addToHistory(algorithm, hash, text.substring(0, 30) + (text.length > 30 ? '...' : ''));
+        }
+
+        // Generate file hash
+        async function generateFileHash(file) {
+            const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
+                let hash = '';
+
+                switch(algorithm) {
+                    case 'MD5':
+                        hash = CryptoJS.MD5(wordArray).toString();
+                        break;
+                    case 'SHA-1':
+                        hash = CryptoJS.SHA1(wordArray).toString();
+                        break;
+                    case 'SHA-256':
+                        hash = CryptoJS.SHA256(wordArray).toString();
+                        break;
+                    case 'SHA-512':
+                        hash = CryptoJS.SHA512(wordArray).toString();
+                        break;
+                }
+
+                document.getElementById('fileHashOutput').value = hash;
+                addToHistory(algorithm, hash, file.name);
+            } catch (error) {
+                alert('Error generating file hash: ' + error.message);
+            }
+        }
+
+        // Add to history
+        function addToHistory(algorithm, hash, input) {
+            hashHistory.unshift({ algorithm, hash, input, timestamp: new Date() });
+            if (hashHistory.length > MAX_HISTORY) {
+                hashHistory.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('hashHistory');
+            historyContainer.innerHTML = '';
+            
+            hashHistory.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'list-group-item history-item';
+                element.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${item.algorithm} - ${item.input}</small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('${item.hash}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="mt-1">${item.hash}</div>
+                `;
+                historyContainer.appendChild(element);
+            });
+        }
+
+        // Copy hash
+        function copyHash(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element.value) return;
+
+            navigator.clipboard.writeText(element.value).then(() => {
+                alert('Hash copied to clipboard!');
+            });
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Hash copied to clipboard!');
+            });
+        }
+
+        // File drag and drop handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            fileInfo.textContent = `Selected file: ${file.name} (${formatFileSize(file.size)})`;
+            generateFileHash(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Initialize
+        document.querySelectorAll('input[name="algorithm"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) generateFileHash(file);
+                if (document.getElementById('inputText').value) generateTextHash();
+            });
+        });
+    </script>
+</body>
+</html> 

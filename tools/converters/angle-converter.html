@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angle Converter - Free Online Tools</title>
+    <meta name="description" content="Convert between different angle units including degrees, radians, gradians, and more with our free online Angle Converter tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="converter-style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Angle Converter</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="converter-container">
+                            <div class="input-group mb-3">
+                                <input type="number" id="fromValue" class="form-control" placeholder="Enter value" aria-label="Enter value to convert">
+                                <select id="fromUnit" class="form-select" aria-label="Select source unit">
+                                    <option value="deg">Degrees (°)</option>
+                                    <option value="rad">Radians (rad)</option>
+                                    <option value="grad">Gradians (grad)</option>
+                                    <option value="turn">Turns</option>
+                                    <option value="dms">Degrees Minutes Seconds (DMS)</option>
+                                    <option value="mil">Mil (NATO)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <button class="btn btn-primary" onclick="swapUnits()">
+                                    <i class="fas fa-exchange-alt"></i> Swap
+                                </button>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <input type="number" id="toValue" class="form-control" readonly aria-label="Converted value">
+                                <select id="toUnit" class="form-select" aria-label="Select target unit">
+                                    <option value="rad">Radians (rad)</option>
+                                    <option value="deg">Degrees (°)</option>
+                                    <option value="grad">Gradians (grad)</option>
+                                    <option value="turn">Turns</option>
+                                    <option value="dms">Degrees Minutes Seconds (DMS)</option>
+                                    <option value="mil">Mil (NATO)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-success" onclick="copyResult()">
+                                    <i class="fas fa-copy"></i> Copy Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Conversions -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Common Angle Conversions</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Formula</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Degrees</td>
+                                        <td>Radians</td>
+                                        <td>° × π/180</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Radians</td>
+                                        <td>Degrees</td>
+                                        <td>rad × 180/π</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Degrees</td>
+                                        <td>Gradians</td>
+                                        <td>° × 10/9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Degrees</td>
+                                        <td>Turns</td>
+                                        <td>° ÷ 360</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Convert to radians first, then to target unit
+        function convertToRadians(value, fromUnit) {
+            switch(fromUnit) {
+                case 'deg':
+                    return value * Math.PI / 180;
+                case 'rad':
+                    return value;
+                case 'grad':
+                    return value * Math.PI / 200;
+                case 'turn':
+                    return value * 2 * Math.PI;
+                case 'dms':
+                    // Assuming value is in decimal degrees
+                    return value * Math.PI / 180;
+                case 'mil':
+                    return value * Math.PI / 3200;
+                default:
+                    return value;
+            }
+        }
+
+        function convertFromRadians(value, toUnit) {
+            switch(toUnit) {
+                case 'deg':
+                    return value * 180 / Math.PI;
+                case 'rad':
+                    return value;
+                case 'grad':
+                    return value * 200 / Math.PI;
+                case 'turn':
+                    return value / (2 * Math.PI);
+                case 'dms':
+                    // Convert to decimal degrees first
+                    const degrees = value * 180 / Math.PI;
+                    const d = Math.floor(degrees);
+                    const m = Math.floor((degrees - d) * 60);
+                    const s = ((degrees - d) * 60 - m) * 60;
+                    return d + m/100 + s/10000;
+                case 'mil':
+                    return value * 3200 / Math.PI;
+                default:
+                    return value;
+            }
+        }
+
+        // Convert function
+        function convert() {
+            const fromValue = parseFloat(document.getElementById('fromValue').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            
+            if (isNaN(fromValue)) {
+                document.getElementById('toValue').value = '';
+                return;
+            }
+            
+            // Convert to radians first, then to target unit
+            const radians = convertToRadians(fromValue, fromUnit);
+            const result = convertFromRadians(radians, toUnit);
+            
+            document.getElementById('toValue').value = result.toFixed(6);
+        }
+
+        // Swap units function
+        function swapUnits() {
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            const fromValue = document.getElementById('fromValue');
+            const toValue = document.getElementById('toValue');
+            
+            [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+            
+            if (fromValue.value !== '') {
+                convert();
+            }
+        }
+
+        // Copy result function
+        function copyResult() {
+            const toValue = document.getElementById('toValue');
+            const toUnit = document.getElementById('toUnit');
+            
+            if (toValue.value === '') return;
+            
+            const textToCopy = `${toValue.value} ${toUnit.options[toUnit.selectedIndex].text}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Result copied to clipboard!');
+            });
+        }
+
+        // Add event listeners
+        document.getElementById('fromValue').addEventListener('input', convert);
+        document.getElementById('fromUnit').addEventListener('change', convert);
+        document.getElementById('toUnit').addEventListener('change', convert);
+    </script>
+</body>
+</html> 

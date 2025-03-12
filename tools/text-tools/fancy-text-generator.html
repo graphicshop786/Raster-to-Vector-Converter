@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Text Generator - Free Online Tools</title>
+    <meta name="description" content="Generate stylish and fancy text with our free online Fancy Text Generator tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .font-preview {
+            font-size: 1.2em;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .font-preview:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .font-preview.selected {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+        
+        .favorite-style {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #dc3545;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Fancy Text Generator</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Input Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">Enter your text</label>
+                            <textarea class="form-control" id="inputText" rows="3" placeholder="Type or paste your text here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Font Categories -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Font Categories</h5>
+                        <div class="btn-group w-100 mb-3" role="group" aria-label="Font categories">
+                            <button type="button" class="btn btn-outline-primary active" onclick="showCategory('all')">All</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCategory('fancy')">Fancy</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCategory('cool')">Cool</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCategory('cute')">Cute</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCategory('symbols')">Symbols</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Styles -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Generated Styles</h5>
+                        <div id="fontStyles" class="row g-3">
+                            <!-- Font styles will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Favorites Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Favorite Styles</h5>
+                        <div id="favoriteStyles" class="row g-3">
+                            <!-- Favorite styles will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const inputText = document.getElementById('inputText');
+        const fontStyles = document.getElementById('fontStyles');
+        const favoriteStyles = document.getElementById('favoriteStyles');
+        
+        // Font style mappings
+        const fonts = {
+            fancy: {
+                '𝓢𝓽𝔂𝓵𝓮 𝟏': str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0x1D4D0)).join(''),
+                '𝔖𝔱𝔶𝔩𝔢 2': str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0x1D504)).join(''),
+                '𝕊𝕥𝕪𝕝𝕖 𝟛': str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0x1D538)).join(''),
+                '𝒮𝓉𝓎𝓁ℯ 4': str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0x1D4EA)).join('')
+            },
+            cool: {
+                'ｓｔｙｌｅ 5': str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0xFEE0)).join(''),
+                'ⓢⓣⓨⓛⓔ 6': str => str.split('').map(c => `⓪①②③④⑤⑥⑦⑧⑨`[c] || c).join(''),
+                'sᴛʏʟᴇ 7': str => str.toLowerCase().split('').map(c => String.fromCharCode(c.charCodeAt(0) + 0x1C00)).join(''),
+                'ѕтуℓє 8': str => str.split('').map(c => {
+                    const alternatives = {
+                        'a': 'α', 'b': 'в', 'c': 'c', 'd': 'ɗ', 'e': 'є', 'f': 'f',
+                        'g': 'g', 'h': 'н', 'i': 'ι', 'j': 'נ', 'k': 'к', 'l': 'ℓ',
+                        'm': 'м', 'n': 'η', 'o': 'σ', 'p': 'ρ', 'q': 'q', 'r': 'я',
+                        's': 'ѕ', 't': 'т', 'u': 'υ', 'v': 'ν', 'w': 'ω', 'x': 'χ',
+                        'y': 'у', 'z': 'z'
+                    };
+                    return alternatives[c.toLowerCase()] || c;
+                }).join('')
+            },
+            cute: {
+                'ｓｔｙｌｅ 9': str => str.split('').map(c => c + '゜').join(''),
+                'style 10': str => `★${str}★`.split('').join('♥'),
+                'style 11': str => `🌸${str}🌸`.split('').join('✿'),
+                'style 12': str => `🎀${str}🎀`.split('').join('･')
+            },
+            symbols: {
+                'style 13': str => `【${str}】`,
+                'style 14': str => `『${str}』`,
+                'style 15': str => `▌${str}▐`,
+                'style 16': str => `《${str}》`
+            }
+        };
+        
+        // Initialize favorites from localStorage
+        let favorites = JSON.parse(localStorage.getItem('fancyTextFavorites')) || [];
+        
+        function generateStyles() {
+            const text = inputText.value || 'Preview Text';
+            fontStyles.innerHTML = '';
+            
+            Object.entries(fonts).forEach(([category, styles]) => {
+                Object.entries(styles).forEach(([name, converter]) => {
+                    const converted = converter(text);
+                    addFontPreview(converted, name, category);
+                });
+            });
+        }
+        
+        function addFontPreview(text, styleName, category) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6';
+            col.dataset.category = category;
+            
+            const preview = document.createElement('div');
+            preview.className = 'font-preview position-relative';
+            preview.innerHTML = `
+                <i class="fas fa-heart favorite-style${favorites.includes(styleName) ? ' text-danger' : ''}"
+                   onclick="toggleFavorite('${styleName}', this)"></i>
+                <div class="text-center">${text}</div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-muted">${styleName}</small>
+                    <button class="btn btn-sm btn-primary" onclick="copyText(this)">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            `;
+            
+            col.appendChild(preview);
+            fontStyles.appendChild(col);
+        }
+        
+        function showCategory(category) {
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === category) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('#fontStyles > div').forEach(div => {
+                if (category === 'all' || div.dataset.category === category) {
+                    div.style.display = '';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleFavorite(styleName, element) {
+            const index = favorites.indexOf(styleName);
+            if (index === -1) {
+                favorites.push(styleName);
+                element.classList.add('text-danger');
+            } else {
+                favorites.splice(index, 1);
+                element.classList.remove('text-danger');
+            }
+            
+            localStorage.setItem('fancyTextFavorites', JSON.stringify(favorites));
+            updateFavorites();
+        }
+        
+        function updateFavorites() {
+            favoriteStyles.innerHTML = '';
+            
+            if (favorites.length === 0) {
+                favoriteStyles.innerHTML = '<p class="text-muted text-center mb-0">No favorite styles yet</p>';
+                return;
+            }
+            
+            favorites.forEach(styleName => {
+                const category = Object.entries(fonts).find(([_, styles]) => styleName in styles)[0];
+                const converter = fonts[category][styleName];
+                const text = inputText.value || 'Preview Text';
+                addFontPreview(converter(text), styleName, category);
+            });
+        }
+        
+        function copyText(button) {
+            const text = button.parentElement.parentElement.querySelector('.text-center').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Event listeners
+        inputText.addEventListener('input', generateStyles);
+        
+        // Initialize
+        generateStyles();
+        updateFavorites();
+    </script>
+</body>
+</html> 

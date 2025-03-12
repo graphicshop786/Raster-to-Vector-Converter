@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Code Picker - Free Online Tools</title>
+    <meta name="description" content="Pick and convert between different color formats with our free online color picker tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .color-preview {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .color-input {
+            width: 100%;
+            height: 40px;
+            padding: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .color-value {
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Color Code Picker</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Color Picker:</label>
+                                    <input type="color" id="color-picker" class="color-input" value="#000000" 
+                                           aria-label="Choose a color" title="Choose a color">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Preview:</label>
+                                    <div id="color-preview" class="color-preview"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Color Values:</label>
+                                    <div class="list-group">
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>HEX:</strong>
+                                                <span id="hex-value" class="color-value">#000000</span>
+                                                <button class="btn btn-sm btn-outline-primary copy-btn" data-value="hex" 
+                                                        title="Copy HEX value" aria-label="Copy HEX value">
+                                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>RGB:</strong>
+                                                <span id="rgb-value" class="color-value">rgb(0, 0, 0)</span>
+                                                <button class="btn btn-sm btn-outline-primary copy-btn" data-value="rgb" 
+                                                        title="Copy RGB value" aria-label="Copy RGB value">
+                                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>HSL:</strong>
+                                                <span id="hsl-value" class="color-value">hsl(0, 0%, 0%)</span>
+                                                <button class="btn btn-sm btn-outline-primary copy-btn" data-value="hsl" 
+                                                        title="Copy HSL value" aria-label="Copy HSL value">
+                                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>CMYK:</strong>
+                                                <span id="cmyk-value" class="color-value">cmyk(0%, 0%, 0%, 100%)</span>
+                                                <button class="btn btn-sm btn-outline-primary copy-btn" data-value="cmyk" 
+                                                        title="Copy CMYK value" aria-label="Copy CMYK value">
+                                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    <script>
+        // Convert hex to RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        // Convert RGB to HSL
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
+        }
+
+        // Convert RGB to CMYK
+        function rgbToCmyk(r, g, b) {
+            let c = 1 - (r / 255);
+            let m = 1 - (g / 255);
+            let y = 1 - (b / 255);
+            let k = Math.min(c, m, y);
+
+            c = ((c - k) / (1 - k)) || 0;
+            m = ((m - k) / (1 - k)) || 0;
+            y = ((y - k) / (1 - k)) || 0;
+
+            return {
+                c: Math.round(c * 100),
+                m: Math.round(m * 100),
+                y: Math.round(y * 100),
+                k: Math.round(k * 100)
+            };
+        }
+
+        // Update all color values
+        function updateColorValues(hex) {
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+
+            document.getElementById('hex-value').textContent = hex;
+            document.getElementById('rgb-value').textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            document.getElementById('hsl-value').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('cmyk-value').textContent = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+            document.getElementById('color-preview').style.backgroundColor = hex;
+        }
+
+        // Initialize color picker
+        const colorPicker = document.getElementById('color-picker');
+        colorPicker.addEventListener('input', (e) => {
+            updateColorValues(e.target.value);
+        });
+
+        // Copy to clipboard functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const valueType = btn.dataset.value;
+                const value = document.getElementById(`${valueType}-value`).textContent;
+                navigator.clipboard.writeText(value).then(() => {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                    }, 1000);
+                });
+            });
+        });
+
+        // Initialize with default color
+        updateColorValues('#000000');
+    </script>
+</body>
+</html> 

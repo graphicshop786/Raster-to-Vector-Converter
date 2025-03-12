@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Checker - Free Online Tools</title>
+    <meta name="description" content="Check your text for grammar, spelling, and punctuation errors with our free online Grammar Checker tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .error-highlight {
+            background-color: rgba(255, 0, 0, 0.1);
+            border-bottom: 2px wavy red;
+            cursor: pointer;
+        }
+        .suggestion-tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .error-category {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        .error-grammar { background-color: #ffebee; }
+        .error-spelling { background-color: #e8f5e9; }
+        .error-punctuation { background-color: #e3f2fd; }
+        .error-style { background-color: #fff3e0; }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Grammar Checker</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label">Enter or paste your text</label>
+                            <textarea class="form-control" id="textInput" rows="10" placeholder="Type or paste your text here to check for grammar, spelling, and punctuation errors..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkSpelling" checked>
+                                <label class="form-check-label" for="checkSpelling">
+                                    Check spelling
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkGrammar" checked>
+                                <label class="form-check-label" for="checkGrammar">
+                                    Check grammar
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkPunctuation" checked>
+                                <label class="form-check-label" for="checkPunctuation">
+                                    Check punctuation
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkStyle">
+                                <label class="form-check-label" for="checkStyle">
+                                    Check style
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="checkGrammar()" id="checkButton">
+                            <i class="fas fa-check"></i> Check Text
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Checking your text...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="d-none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Analysis Summary</h5>
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-danger text-white">
+                                        <div class="card-body">
+                                            <h3 id="grammarCount">0</h3>
+                                            <p class="mb-0">Grammar</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-warning text-white">
+                                        <div class="card-body">
+                                            <h3 id="spellingCount">0</h3>
+                                            <p class="mb-0">Spelling</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-info text-white">
+                                        <div class="card-body">
+                                            <h3 id="punctuationCount">0</h3>
+                                            <p class="mb-0">Punctuation</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body">
+                                            <h3 id="styleCount">0</h3>
+                                            <p class="mb-0">Style</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Corrected Text</h5>
+                            <div id="correctedText" class="border rounded p-3" style="white-space: pre-wrap;">
+                                <!-- Corrected text with highlights will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Suggestions</h5>
+                            <div id="suggestionsList" class="list-group">
+                                <!-- Suggestions will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const textInput = document.getElementById('textInput');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const checkButton = document.getElementById('checkButton');
+        
+        // Common grammar and spelling mistakes for demo
+        const commonErrors = {
+            grammar: [
+                { pattern: /\b(me and \w+)\b/gi, suggestion: "Replace with '[other person] and I'", category: "grammar" },
+                { pattern: /\b(their is)\b/gi, suggestion: "Use 'there is'", category: "grammar" },
+                { pattern: /\b(your)\b(?= (the|a|an|my|his|her|their|our))/gi, suggestion: "Use 'you're' (you are)", category: "grammar" },
+                { pattern: /\b(its)\b(?= (a|an|the|my|your|his|her|their|our))/gi, suggestion: "Use 'it's' (it is)", category: "grammar" }
+            ],
+            spelling: [
+                { pattern: /\b(recieve)\b/gi, suggestion: "Correct spelling is 'receive'", category: "spelling" },
+                { pattern: /\b(seperate)\b/gi, suggestion: "Correct spelling is 'separate'", category: "spelling" },
+                { pattern: /\b(occured)\b/gi, suggestion: "Correct spelling is 'occurred'", category: "spelling" },
+                { pattern: /\b(accomodate)\b/gi, suggestion: "Correct spelling is 'accommodate'", category: "spelling" }
+            ],
+            punctuation: [
+                { pattern: /\b(\w+)\s+,/g, suggestion: "Remove space before comma", category: "punctuation" },
+                { pattern: /([.!?])\s*([a-z])/g, suggestion: "Capitalize letter after period", category: "punctuation" },
+                { pattern: /\b(dont|cant|wont|shouldnt|couldnt|wouldnt)\b/gi, suggestion: "Add apostrophe", category: "punctuation" }
+            ],
+            style: [
+                { pattern: /\b(very)\b/gi, suggestion: "Consider using a stronger adjective", category: "style" },
+                { pattern: /\b(thing|stuff)\b/gi, suggestion: "Use more specific nouns", category: "style" },
+                { pattern: /\b(good)\b/gi, suggestion: "Consider using a more descriptive adjective", category: "style" }
+            ]
+        };
+        
+        function checkGrammar() {
+            const text = textInput.value.trim();
+            
+            if (text.length < 10) {
+                alert('Please enter at least 10 characters of text to check.');
+                return;
+            }
+            
+            // Show loading spinner
+            loadingSpinner.classList.remove('d-none');
+            resultsSection.classList.add('d-none');
+            checkButton.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                analyzeText(text);
+            }, 1500);
+        }
+        
+        function analyzeText(text) {
+            const errors = [];
+            const checkTypes = {
+                grammar: document.getElementById('checkGrammar').checked,
+                spelling: document.getElementById('checkSpelling').checked,
+                punctuation: document.getElementById('checkPunctuation').checked,
+                style: document.getElementById('checkStyle').checked
+            };
+            
+            // Find errors based on selected check types
+            Object.entries(checkTypes).forEach(([type, isChecked]) => {
+                if (isChecked && commonErrors[type]) {
+                    commonErrors[type].forEach(error => {
+                        let match;
+                        while ((match = error.pattern.exec(text)) !== null) {
+                            errors.push({
+                                text: match[0],
+                                index: match.index,
+                                length: match[0].length,
+                                suggestion: error.suggestion,
+                                category: error.category
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Update UI with results
+            updateErrorCounts(errors);
+            highlightErrors(text, errors);
+            updateSuggestions(errors);
+            
+            // Hide loading spinner and show results
+            loadingSpinner.classList.add('d-none');
+            resultsSection.classList.remove('d-none');
+            checkButton.disabled = false;
+        }
+        
+        function updateErrorCounts(errors) {
+            const counts = {
+                grammar: 0,
+                spelling: 0,
+                punctuation: 0,
+                style: 0
+            };
+            
+            errors.forEach(error => {
+                counts[error.category]++;
+            });
+            
+            document.getElementById('grammarCount').textContent = counts.grammar;
+            document.getElementById('spellingCount').textContent = counts.spelling;
+            document.getElementById('punctuationCount').textContent = counts.punctuation;
+            document.getElementById('styleCount').textContent = counts.style;
+        }
+        
+        function highlightErrors(text, errors) {
+            const container = document.getElementById('correctedText');
+            let highlightedText = text;
+            let offset = 0;
+            
+            // Sort errors by index in descending order to maintain correct positions
+            errors.sort((a, b) => b.index - a.index);
+            
+            errors.forEach(error => {
+                const before = highlightedText.substring(0, error.index);
+                const after = highlightedText.substring(error.index + error.length);
+                const highlight = `<span class="error-highlight" data-suggestion="${error.suggestion}" data-category="${error.category}">${error.text}</span>`;
+                highlightedText = before + highlight + after;
+            });
+            
+            container.innerHTML = highlightedText;
+            
+            // Add click handlers for highlighted errors
+            document.querySelectorAll('.error-highlight').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    showSuggestionTooltip(e.target);
+                });
+            });
+        }
+        
+        function updateSuggestions(errors) {
+            const container = document.getElementById('suggestionsList');
+            container.innerHTML = '';
+            
+            if (errors.length === 0) {
+                container.innerHTML = '<p class="text-success mb-0"><i class="fas fa-check-circle"></i> No errors found in your text!</p>';
+                return;
+            }
+            
+            errors.forEach(error => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item';
+                item.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="error-category error-${error.category}">${error.category}</span>
+                            <strong>"${error.text}"</strong>
+                            <p class="mb-0 text-muted small">${error.suggestion}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function showSuggestionTooltip(element) {
+            // Remove any existing tooltips
+            document.querySelectorAll('.suggestion-tooltip').forEach(tooltip => tooltip.remove());
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'suggestion-tooltip';
+            tooltip.innerHTML = `
+                <p class="mb-2"><strong>Suggestion:</strong></p>
+                <p class="mb-2">${element.dataset.suggestion}</p>
+                <button class="btn btn-sm btn-primary" onclick="this.parentElement.remove()">Got it</button>
+            `;
+            
+            // Position tooltip near the element
+            const rect = element.getBoundingClientRect();
+            tooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            
+            document.body.appendChild(tooltip);
+            
+            // Close tooltip when clicking outside
+            document.addEventListener('click', function closeTooltip(e) {
+                if (!tooltip.contains(e.target) && !element.contains(e.target)) {
+                    tooltip.remove();
+                    document.removeEventListener('click', closeTooltip);
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

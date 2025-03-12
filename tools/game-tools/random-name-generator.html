@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Name Generator - Free Game Tools</title>
+    <meta name="description" content="Generate random character names for games, stories, or role-playing games. Create fantasy, sci-fi, or realistic names.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <main class="container py-4">
+        <div class="tool-container">
+            <div class="tool-header text-center mb-4">
+                <h1>Random Name Generator</h1>
+                <p class="lead">Generate creative names for characters, games, or stories</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Generator Options</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="name-generator-form">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="name-type" class="form-label">Name Type</label>
+                                    <select class="form-select" id="name-type">
+                                        <option value="fantasy">Fantasy</option>
+                                        <option value="sci-fi">Sci-Fi</option>
+                                        <option value="medieval">Medieval</option>
+                                        <option value="modern">Modern</option>
+                                        <option value="ancient">Ancient</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="gender">
+                                        <option value="any">Any</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="neutral">Gender Neutral</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="name-length" class="form-label">Name Length</label>
+                                    <select class="form-select" id="name-length">
+                                        <option value="any">Any Length</option>
+                                        <option value="short">Short (3-5 letters)</option>
+                                        <option value="medium">Medium (6-9 letters)</option>
+                                        <option value="long">Long (10+ letters)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="name-count" class="form-label">Number of Names</label>
+                                    <input type="number" class="form-control" id="name-count" min="1" max="50" value="10">
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="include-surname" checked>
+                                <label class="form-check-label" for="include-surname">
+                                    Include Surname/Last Name
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="include-title">
+                                <label class="form-check-label" for="include-title">
+                                    Include Title (e.g., King, Captain, Dr.)
+                                </label>
+                            </div>
+                            <div class="d-grid">
+                                <button type="button" id="generate-btn" class="btn btn-primary">
+                                    <i class="fas fa-random me-2"></i>Generate Names
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Generated Names</h5>
+                        <div>
+                            <button id="copy-all-btn" class="btn btn-sm btn-secondary" disabled>
+                                <i class="fas fa-copy me-1"></i>Copy All
+                            </button>
+                            <button id="clear-btn" class="btn btn-sm btn-danger ms-2" disabled>
+                                <i class="fas fa-trash me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-container" class="p-3 border rounded bg-light">
+                            <p class="text-center text-muted mb-0">Generated names will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">How to Use</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li>Select the type of name you want to generate (Fantasy, Sci-Fi, etc.)</li>
+                            <li>Choose gender preference for the names</li>
+                            <li>Select desired name length</li>
+                            <li>Enter how many names you want to generate (1-50)</li>
+                            <li>Choose whether to include surnames and titles</li>
+                            <li>Click "Generate Names" to create your list</li>
+                            <li>Copy individual names by clicking on them or use "Copy All" for the entire list</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/tools-data.js"></script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const generateBtn = document.getElementById('generate-btn');
+            const copyAllBtn = document.getElementById('copy-all-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Name data
+            const nameData = {
+                fantasy: {
+                    male: {
+                        first: ['Aragorn', 'Legolas', 'Gandalf', 'Frodo', 'Thorin', 'Elrond', 'Boromir', 'Thranduil', 'Gimli', 'Faramir', 'Saruman', 'Galadriel', 'Celeborn', 'Theoden', 'Eomer', 'Denethor', 'Glorfindel', 'Haldir', 'Radagast', 'Beorn'],
+                        last: ['Oakenshield', 'Baggins', 'Greybeard', 'Stormcrow', 'Shadowfax', 'Dragonslayer', 'Lightbringer', 'Silvertongue', 'Ironfoot', 'Firebeard', 'Stonehelm', 'Darkwood', 'Brightblade', 'Swiftarrow', 'Nightwalker', 'Stormborn', 'Frostbeard', 'Goldenhair', 'Strongheart', 'Wildfire']
+                    },
+                    female: {
+                        first: ['Arwen', 'Eowyn', 'Galadriel', 'Tauriel', 'Luthien', 'Morwen', 'Idril', 'Aredhel', 'Celebrian', 'Elwing', 'Nienna', 'Varda', 'Yavanna', 'Nessa', 'Vana', 'Melian', 'Finduilas', 'Miriel', 'Erendis', 'Haleth'],
+                        last: ['Evenstar', 'Silverleaf', 'Starblossom', 'Moonwhisper', 'Dawnlight', 'Nightshade', 'Frostbloom', 'Willowbranch', 'Sunfire', 'Dreamweaver', 'Swiftbrook', 'Goldenflower', 'Shadowdancer', 'Lightfoot', 'Windrider', 'Stormchaser', 'Brightmoon', 'Silversong', 'Stargazer', 'Wildrose']
+                    },
+                    titles: ['Lord', 'Lady', 'King', 'Queen', 'Prince', 'Princess', 'Duke', 'Duchess', 'Baron', 'Baroness', 'Sir', 'Dame', 'Master', 'Mistress', 'Elder', 'High', 'Grand', 'Arch', 'Royal', 'Noble']
+                },
+                'sci-fi': {
+                    male: {
+                        first: ['Zephyr', 'Nova', 'Orion', 'Zenith', 'Quasar', 'Vega', 'Atlas', 'Cygnus', 'Draco', 'Helios', 'Jericho', 'Krypton', 'Lyra', 'Nebula', 'Oberon', 'Phoenix', 'Rigel', 'Sirius', 'Taurus', 'Xander'],
+                        last: ['Stargazer', 'Voidwalker', 'Lightspeed', 'Quantum', 'Nebula', 'Stardust', 'Comet', 'Pulsar', 'Neutron', 'Galactic', 'Cosmic', 'Astral', 'Stellar', 'Orbit', 'Eclipse', 'Solaris', 'Lunar', 'Meteor', 'Gravity', 'Warp']
+                    },
+                    female: {
+                        first: ['Andromeda', 'Bellatrix', 'Cassiopeia', 'Delta', 'Eclipse', 'Freya', 'Genesis', 'Halley', 'Io', 'Jupiter', 'Kira', 'Luna', 'Mira', 'Nebula', 'Orion', 'Phoebe', 'Quasar', 'Rhea', 'Stella', 'Terra'],
+                        last: ['Starlight', 'Voidwalker', 'Lightspeed', 'Quantum', 'Nebula', 'Stardust', 'Comet', 'Pulsar', 'Neutron', 'Galactic', 'Cosmic', 'Astral', 'Stellar', 'Orbit', 'Eclipse', 'Solaris', 'Lunar', 'Meteor', 'Gravity', 'Warp']
+                    },
+                    titles: ['Commander', 'Captain', 'Admiral', 'Lieutenant', 'Ensign', 'Chief', 'Director', 'Doctor', 'Professor', 'Specialist', 'Agent', 'Pilot', 'Navigator', 'Engineer', 'Technician', 'Officer', 'Sergeant', 'General', 'Major', 'Colonel']
+                },
+                medieval: {
+                    male: {
+                        first: ['Arthur', 'Baldwin', 'Cedric', 'Duncan', 'Edmund', 'Frederick', 'Gareth', 'Harold', 'Ivanhoe', 'Jasper', 'Kenneth', 'Lancelot', 'Merlin', 'Nathaniel', 'Oswald', 'Percival', 'Quentin', 'Roland', 'Siegfried', 'Tristan'],
+                        last: ['Blackwood', 'Ironside', 'Strongarm', 'Oakhart', 'Silverhand', 'Wolfsbane', 'Hawkeye', 'Lionheart', 'Steelhelm', 'Darkwater', 'Goldenshield', 'Swiftblade', 'Stonewall', 'Highcastle', 'Longbow', 'Whiteoak', 'Redcloak', 'Blackthorn', 'Greymantle', 'Fireheart']
+                    },
+                    female: {
+                        first: ['Adelaide', 'Beatrice', 'Catherine', 'Eleanor', 'Florence', 'Guinevere', 'Helena', 'Isabella', 'Josephine', 'Katherine', 'Lucinda', 'Matilda', 'Nicolette', 'Olivia', 'Philippa', 'Rosalind', 'Sophia', 'Theresa', 'Vivienne', 'Wilhelmina'],
+                        last: ['Blackwood', 'Fairchild', 'Roseheart', 'Silverbrook', 'Goldenhair', 'Swanwhite', 'Nightingale', 'Sweetwater', 'Trueheart', 'Gentlehand', 'Lightfoot', 'Morningstar', 'Whiterose', 'Fairmaiden', 'Goodwife', 'Silverthorn', 'Honeywood', 'Brightmoon', 'Summersong', 'Winterborn']
+                    },
+                    titles: ['Sir', 'Lady', 'Lord', 'Dame', 'Baron', 'Baroness', 'Count', 'Countess', 'Duke', 'Duchess', 'King', 'Queen', 'Prince', 'Princess', 'Knight', 'Squire', 'Page', 'Maiden', 'Master', 'Mistress']
+                },
+                modern: {
+                    male: {
+                        first: ['Alexander', 'Benjamin', 'Christopher', 'Daniel', 'Ethan', 'Frederick', 'Gabriel', 'Henry', 'Isaac', 'Jacob', 'Kevin', 'Liam', 'Michael', 'Nathan', 'Oliver', 'Patrick', 'Quentin', 'Robert', 'Samuel', 'Thomas'],
+                        last: ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson']
+                    },
+                    female: {
+                        first: ['Amelia', 'Brianna', 'Charlotte', 'Diana', 'Emily', 'Fiona', 'Grace', 'Hannah', 'Isabella', 'Julia', 'Katherine', 'Lily', 'Madison', 'Natalie', 'Olivia', 'Penelope', 'Quinn', 'Rachel', 'Sophia', 'Victoria'],
+                        last: ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson']
+                    },
+                    titles: ['Dr.', 'Mr.', 'Mrs.', 'Ms.', 'Prof.', 'Rev.', 'Hon.', 'Capt.', 'Lt.', 'Sgt.', 'Maj.', 'Col.', 'Gen.', 'Adm.', 'CEO', 'VP', 'Dir.', 'Mgr.', 'Pres.', 'Coach']
+                },
+                ancient: {
+                    male: {
+                        first: ['Achilles', 'Brutus', 'Caesar', 'Darius', 'Euripides', 'Flavius', 'Gaius', 'Herodotus', 'Icarus', 'Julius', 'Khufu', 'Leonidas', 'Marcus', 'Nero', 'Octavius', 'Ptolemy', 'Quintus', 'Ramses', 'Socrates', 'Tiberius'],
+                        last: ['Aurelius', 'Brutus', 'Cicero', 'Drusus', 'Eugenius', 'Flavius', 'Gracchus', 'Horatius', 'Iulius', 'Junius', 'Kaeso', 'Livius', 'Marius', 'Nerva', 'Octavius', 'Pompeius', 'Quintillius', 'Rufus', 'Seneca', 'Tiberius']
+                    },
+                    female: {
+                        first: ['Agrippina', 'Boudica', 'Cleopatra', 'Drusilla', 'Eurydice', 'Fulvia', 'Galatea', 'Helena', 'Iphigenia', 'Julia', 'Kore', 'Livia', 'Messalina', 'Nefertiti', 'Octavia', 'Pompeia', 'Quintilia', 'Roxana', 'Sappho', 'Tullia'],
+                        last: ['Antonia', 'Brutus', 'Claudia', 'Domitia', 'Eutropia', 'Flavia', 'Germanicus', 'Hortensia', 'Iulia', 'Junia', 'Kaeso', 'Livia', 'Marcia', 'Nerva', 'Octavia', 'Pompeia', 'Quintillia', 'Rufina', 'Seneca', 'Tiberia']
+                    },
+                    titles: ['Emperor', 'Empress', 'Pharaoh', 'King', 'Queen', 'Caesar', 'Augusta', 'Consul', 'Senator', 'Praetor', 'Tribune', 'Centurion', 'Legate', 'Prefect', 'High Priest', 'High Priestess', 'Oracle', 'Soothsayer', 'Philosopher', 'Sage']
+                }
+            };
+            
+            // Generate random names
+            function generateRandomNames() {
+                const nameType = document.getElementById('name-type').value;
+                const gender = document.getElementById('gender').value;
+                const nameLength = document.getElementById('name-length').value;
+                const nameCount = parseInt(document.getElementById('name-count').value);
+                const includeSurname = document.getElementById('include-surname').checked;
+                const includeTitle = document.getElementById('include-title').checked;
+                
+                // Validate inputs
+                if (nameCount < 1 || nameCount > 50) {
+                    alert('Please enter a number between 1 and 50 for the number of names.');
+                    return;
+                }
+                
+                // Clear previous results
+                resultsContainer.innerHTML = '';
+                
+                // Create list for names
+                const namesList = document.createElement('ul');
+                namesList.className = 'list-group';
+                
+                // Generate names
+                for (let i = 0; i < nameCount; i++) {
+                    // Determine gender for this name
+                    let nameGender = gender;
+                    if (gender === 'any') {
+                        nameGender = Math.random() < 0.5 ? 'male' : 'female';
+                    } else if (gender === 'neutral') {
+                        // For neutral, randomly pick from male or female but don't use gendered titles
+                        nameGender = Math.random() < 0.5 ? 'male' : 'female';
+                    }
+                    
+                    // Get name data for selected type and gender
+                    const firstNames = nameData[nameType][nameGender].first;
+                    const lastNames = nameData[nameType][nameGender].last;
+                    const titles = nameData[nameType].titles;
+                    
+                    // Generate first name
+                    let firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    
+                    // Apply name length filter if specified
+                    if (nameLength !== 'any') {
+                        // Try up to 10 times to find a name of the right length
+                        let attempts = 0;
+                        while (attempts < 10) {
+                            if (nameLength === 'short' && firstName.length >= 3 && firstName.length <= 5) break;
+                            if (nameLength === 'medium' && firstName.length >= 6 && firstName.length <= 9) break;
+                            if (nameLength === 'long' && firstName.length >= 10) break;
+                            
+                            firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                            attempts++;
+                        }
+                    }
+                    
+                    // Generate last name if needed
+                    let lastName = '';
+                    if (includeSurname) {
+                        lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    }
+                    
+                    // Generate title if needed
+                    let title = '';
+                    if (includeTitle) {
+                        // Filter titles by gender if needed
+                        let availableTitles = titles;
+                        if (gender === 'male' || gender === 'female') {
+                            // Simple filtering for gendered titles
+                            availableTitles = titles.filter(t => {
+                                if (gender === 'male' && (t.includes('Lady') || t.includes('Queen') || t.includes('Princess') || t.includes('Duchess') || t.includes('Baroness') || t.includes('Dame') || t.includes('Mistress') || t.includes('Mrs.') || t.includes('Ms.'))) {
+                                    return false;
+                                }
+                                if (gender === 'female' && (t.includes('Lord') || t.includes('King') || t.includes('Prince') || t.includes('Duke') || t.includes('Baron') || t.includes('Sir') || t.includes('Master') || t.includes('Mr.'))) {
+                                    return false;
+                                }
+                                return true;
+                            });
+                        }
+                        
+                        title = availableTitles[Math.floor(Math.random() * availableTitles.length)];
+                    }
+                    
+                    // Combine name parts
+                    let fullName = '';
+                    if (title) fullName += title + ' ';
+                    fullName += firstName;
+                    if (lastName) fullName += ' ' + lastName;
+                    
+                    // Create list item
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.textContent = fullName;
+                    
+                    // Add copy button
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'btn btn-sm btn-outline-secondary copy-btn';
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    copyBtn.title = 'Copy to clipboard';
+                    copyBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(fullName).then(() => {
+                            // Show copied feedback
+                            const originalText = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                            setTimeout(() => {
+                                copyBtn.innerHTML = originalText;
+                            }, 1500);
+                        });
+                    });
+                    
+                    listItem.appendChild(copyBtn);
+                    namesList.appendChild(listItem);
+                }
+                
+                resultsContainer.appendChild(namesList);
+                
+                // Enable buttons
+                copyAllBtn.disabled = false;
+                clearBtn.disabled = false;
+            }
+            
+            // Copy all names
+            function copyAllNames() {
+                const items = document.querySelectorAll('.list-group-item');
+                if (items.length === 0) return;
+                
+                const names = Array.from(items).map(item => {
+                    // Get text content without the copy button text
+                    return item.childNodes[0].textContent.trim();
+                }).join('\n');
+                
+                navigator.clipboard.writeText(names).then(() => {
+                    // Show copied feedback
+                    const originalText = copyAllBtn.innerHTML;
+                    copyAllBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+                    setTimeout(() => {
+                        copyAllBtn.innerHTML = originalText;
+                    }, 1500);
+                });
+            }
+            
+            // Clear results
+            function clearResults() {
+                resultsContainer.innerHTML = '<p class="text-center text-muted mb-0">Generated names will appear here</p>';
+                copyAllBtn.disabled = true;
+                clearBtn.disabled = true;
+            }
+            
+            // Event listeners
+            generateBtn.addEventListener('click', generateRandomNames);
+            copyAllBtn.addEventListener('click', copyAllNames);
+            clearBtn.addEventListener('click', clearResults);
+        });
+    </script>
+</body>
+</html> 

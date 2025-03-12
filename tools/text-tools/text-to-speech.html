@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech - Free Online Tools</title>
+    <meta name="description" content="Convert text to natural-sounding speech with our free online Text to Speech tool. Supports multiple languages including English, Urdu, Hindi and more.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .urdu-text, .arabic-text {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl;
+        }
+        .hindi-text {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+        .language-switch {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        #audioPlayer audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .loading .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        .voice-preview {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            margin: 5px;
+        }
+        .voice-preview:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        .voice-preview.active {
+            background-color: #e9ecef;
+            border-color: #6c757d;
+        }
+        .voice-preview i {
+            margin-right: 8px;
+            color: #0d6efd;
+        }
+        #audioPlayer {
+            margin-top: 20px;
+        }
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .audio-controls button {
+            min-width: 100px;
+        }
+    </style>
+    <!-- Add Google Fonts for different languages -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Text to Speech</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Language Switch -->
+                        <div class="mb-3">
+                            <label for="languageSelect" class="form-label">Select Language</label>
+                            <select class="form-select" id="languageSelect" onchange="handleLanguageChange()">
+                                <option value="en-US">English (US)</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="hi-IN">हिंदी (Hindi)</option>
+                                <option value="ur-PK">اردو (Urdu)</option>
+                                <option value="pa-IN">ਪੰਜਾਬੀ (Punjabi)</option>
+                                <option value="bn-IN">বাংলা (Bengali)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label" id="textInputLabel">Enter or paste your text</label>
+                            <textarea class="form-control" id="textInput" rows="8" placeholder="Type or paste your text here to convert to speech..." dir="auto"></textarea>
+                        </div>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="voiceSelect" class="form-label">Voice Type</label>
+                                <select class="form-select" id="voiceSelect">
+                                    <option value="FEMALE">Female Voice</option>
+                                    <option value="MALE">Male Voice</option>
+                                    <option value="NEUTRAL">Neutral Voice</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="rateRange" class="form-label">Speed</label>
+                                <input type="range" class="form-range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+                                <div class="text-center" id="rateValue">1x</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="pitchRange" class="form-label">Pitch</label>
+                                <input type="range" class="form-range" id="pitchRange" min="-10" max="10" step="1" value="0">
+                                <div class="text-center" id="pitchValue">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Audio Player -->
+                        <div id="audioPlayer" class="text-center">
+                            <audio id="audioElement" controls style="width: 100%; display: none;">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <div class="audio-controls">
+                                <button class="btn btn-primary" onclick="generateSpeech()" id="speakButton">
+                                    <i class="fas fa-play"></i> Generate Speech
+                                </button>
+                                <button class="btn btn-danger" onclick="stopSpeech()" id="stopButton" disabled>
+                                    <i class="fas fa-stop"></i> Stop
+                                </button>
+                                <button class="btn btn-success" onclick="downloadCurrentAudio()" id="downloadButton" disabled>
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading indicator -->
+                        <div class="loading mt-3" id="loadingIndicator">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span>Generating speech...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">History</h5>
+                        <div class="list-group" id="historyList">
+                            <!-- Speech history will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        // Language configurations
+        const languageConfig = {
+            'ur-PK': {
+                label: 'اردو متن درج کریں',
+                placeholder: 'یہاں اردو متن ٹائپ کریں یا پیسٹ کریں...',
+                className: 'urdu-text',
+                direction: 'rtl'
+            },
+            'hi-IN': {
+                label: 'अपना टेक्स्ट दर्ज करें',
+                placeholder: 'यहां टेक्स्ट टाइप करें या पेस्ट करें...',
+                className: 'hindi-text',
+                direction: 'ltr'
+            }
+        };
+
+        // Elements
+        const elements = {
+            textInput: document.getElementById('textInput'),
+            voiceSelect: document.getElementById('voiceSelect'),
+            languageSelect: document.getElementById('languageSelect'),
+            rateRange: document.getElementById('rateRange'),
+            pitchRange: document.getElementById('pitchRange'),
+            rateValue: document.getElementById('rateValue'),
+            pitchValue: document.getElementById('pitchValue'),
+            speakButton: document.getElementById('speakButton'),
+            stopButton: document.getElementById('stopButton'),
+            downloadButton: document.getElementById('downloadButton'),
+            loadingIndicator: document.getElementById('loadingIndicator'),
+            textInputLabel: document.getElementById('textInputLabel'),
+            audioElement: document.getElementById('audioElement'),
+            historyList: document.getElementById('historyList')
+        };
+
+        let currentAudioUrl = null;
+
+        // Handle language change
+        function handleLanguageChange() {
+            const lang = elements.languageSelect.value;
+            const config = languageConfig[lang] || {
+                label: 'Enter or paste your text',
+                placeholder: 'Type or paste your text here to convert to speech...',
+                className: '',
+                direction: 'ltr'
+            };
+            
+            elements.textInput.className = `form-control ${config.className}`;
+            elements.textInput.setAttribute('dir', config.direction);
+            elements.textInput.setAttribute('placeholder', config.placeholder);
+            elements.textInputLabel.textContent = config.label;
+        }
+
+        async function generateSpeech() {
+            const text = elements.textInput.value.trim();
+            
+            if (!text) {
+                alert('Please enter some text to convert to speech.');
+                return;
+            }
+
+            elements.loadingIndicator.style.display = 'flex';
+            elements.speakButton.disabled = true;
+            elements.stopButton.disabled = true;
+            elements.downloadButton.disabled = true;
+
+            try {
+                const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Goog-Api-Key': 'YOUR_API_KEY'
+                    },
+                    body: JSON.stringify({
+                        input: { text },
+                        voice: {
+                            languageCode: elements.languageSelect.value,
+                            ssmlGender: elements.voiceSelect.value
+                        },
+                        audioConfig: {
+                            audioEncoding: 'MP3',
+                            pitch: parseInt(elements.pitchRange.value),
+                            speakingRate: parseFloat(elements.rateRange.value)
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate speech');
+                }
+
+                const { audioContent } = await response.json();
+                const audioBlob = new Blob(
+                    [Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))],
+                    { type: 'audio/mp3' }
+                );
+                
+                if (currentAudioUrl) {
+                    URL.revokeObjectURL(currentAudioUrl);
+                }
+                
+                currentAudioUrl = URL.createObjectURL(audioBlob);
+                elements.audioElement.src = currentAudioUrl;
+                elements.audioElement.style.display = 'block';
+                
+                elements.audioElement.play();
+                elements.stopButton.disabled = false;
+                elements.downloadButton.disabled = false;
+                
+                addToHistory(text);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to generate speech. Please try again.');
+            } finally {
+                elements.loadingIndicator.style.display = 'none';
+                elements.speakButton.disabled = false;
+            }
+        }
+
+        function stopSpeech() {
+            elements.audioElement.pause();
+            elements.audioElement.currentTime = 0;
+            elements.stopButton.disabled = true;
+        }
+
+        function downloadCurrentAudio() {
+            if (!currentAudioUrl) {
+                alert('Please generate speech first');
+                return;
+            }
+
+            const a = document.createElement('a');
+            a.href = currentAudioUrl;
+            a.download = `speech_${elements.languageSelect.value}.mp3`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function addToHistory(text) {
+            const timestamp = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = 'list-group-item';
+            
+            const shortText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+            const lang = elements.languageSelect.value;
+            const config = languageConfig[lang] || { className: '', direction: 'ltr' };
+            
+            item.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1 ${config.className}" dir="${config.direction}">${shortText}</p>
+                        <small class="text-muted">${timestamp} - ${elements.languageSelect.options[elements.languageSelect.selectedIndex].text}</small>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary" onclick="replayHistoryItem(this.parentElement.parentElement.parentElement)">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            elements.historyList.insertBefore(item, elements.historyList.firstChild);
+            
+            while (elements.historyList.children.length > 10) {
+                elements.historyList.removeChild(elements.historyList.lastChild);
+            }
+        }
+
+        function replayHistoryItem(historyItem) {
+            const text = historyItem.querySelector('p').textContent;
+            const className = historyItem.querySelector('p').className;
+            
+            for (const [lang, config] of Object.entries(languageConfig)) {
+                if (className.includes(config.className)) {
+                    elements.languageSelect.value = lang;
+                    break;
+                }
+            }
+            
+            handleLanguageChange();
+            elements.textInput.value = text;
+            generateSpeech();
+        }
+
+        // Update range values
+        elements.rateRange.addEventListener('input', () => {
+            elements.rateValue.textContent = `${elements.rateRange.value}x`;
+        });
+        
+        elements.pitchRange.addEventListener('input', () => {
+            elements.pitchValue.textContent = elements.pitchRange.value;
+        });
+
+        // Initialize
+        handleLanguageChange();
+    </script>
+</body>
+</html> 

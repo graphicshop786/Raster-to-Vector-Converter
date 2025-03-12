@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Checker - Free Online Tools</title>
+    <meta name="description" content="Check your text for plagiarism with our free online Plagiarism Checker tool.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Plagiarism Checker</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label">Enter or paste your text</label>
+                            <textarea class="form-control" id="textInput" rows="10" placeholder="Type or paste your text here (minimum 50 words recommended)..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="excludeQuotes">
+                                <label class="form-check-label" for="excludeQuotes">
+                                    Exclude quoted text
+                                </label>
+                            </div>
+                            <span id="wordCount" class="text-muted">0 words</span>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="checkPlagiarism()" id="checkButton">
+                            <i class="fas fa-search"></i> Check for Plagiarism
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing text for plagiarism...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="d-none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Plagiarism Score</h5>
+                            <div class="progress mb-3" style="height: 25px;">
+                                <div class="progress-bar" id="plagiarismBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                            <p id="plagiarismSummary" class="mb-0"></p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Matched Sources</h5>
+                            <div id="matchedSources" class="list-group">
+                                <!-- Matched sources will be added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Text Analysis</h5>
+                            <div id="textAnalysis" class="border rounded p-3" style="white-space: pre-wrap;">
+                                <!-- Analyzed text with highlights will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../../js/header.js"></script>
+    <script src="../../js/footer.js"></script>
+    
+    <script>
+        const textInput = document.getElementById('textInput');
+        const wordCountElement = document.getElementById('wordCount');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const checkButton = document.getElementById('checkButton');
+        
+        // Update word count on input
+        textInput.addEventListener('input', () => {
+            const words = textInput.value.trim().split(/\s+/).filter(word => word.length > 0);
+            wordCountElement.textContent = `${words.length} words`;
+        });
+        
+        function checkPlagiarism() {
+            const text = textInput.value.trim();
+            const excludeQuotes = document.getElementById('excludeQuotes').checked;
+            
+            if (text.length < 100) {
+                alert('Please enter at least 100 characters of text to check for plagiarism.');
+                return;
+            }
+            
+            // Show loading spinner
+            loadingSpinner.classList.remove('d-none');
+            resultsSection.classList.add('d-none');
+            checkButton.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                analyzePlagiarism(text, excludeQuotes);
+            }, 2000);
+        }
+        
+        function analyzePlagiarism(text, excludeQuotes) {
+            // This is a simulation of plagiarism detection
+            // In a real implementation, this would make API calls to plagiarism detection services
+            
+            const words = text.split(/\s+/);
+            const totalWords = words.length;
+            
+            // Simulate finding matches (random for demo)
+            const plagiarismScore = Math.floor(Math.random() * 30); // Random score between 0-30%
+            const matches = generateSimulatedMatches(text, plagiarismScore);
+            
+            // Update UI with results
+            updatePlagiarismScore(plagiarismScore);
+            updateMatchedSources(matches);
+            highlightText(text, matches);
+            
+            // Hide loading spinner and show results
+            loadingSpinner.classList.add('d-none');
+            resultsSection.classList.remove('d-none');
+            checkButton.disabled = false;
+        }
+        
+        function updatePlagiarismScore(score) {
+            const bar = document.getElementById('plagiarismBar');
+            const summary = document.getElementById('plagiarismSummary');
+            
+            bar.style.width = `${score}%`;
+            bar.textContent = `${score}%`;
+            
+            if (score < 10) {
+                bar.className = 'progress-bar bg-success';
+                summary.innerHTML = '<i class="fas fa-check-circle text-success"></i> Low plagiarism detected. Your text appears to be mostly original.';
+            } else if (score < 20) {
+                bar.className = 'progress-bar bg-warning';
+                summary.innerHTML = '<i class="fas fa-exclamation-circle text-warning"></i> Moderate plagiarism detected. Consider reviewing and citing your sources.';
+            } else {
+                bar.className = 'progress-bar bg-danger';
+                summary.innerHTML = '<i class="fas fa-times-circle text-danger"></i> High plagiarism detected. Please review and revise your text.';
+            }
+        }
+        
+        function generateSimulatedMatches(text, plagiarismScore) {
+            // Simulate finding matches in the text
+            const matches = [];
+            const words = text.split(/\s+/);
+            const numMatches = Math.ceil(plagiarismScore / 10);
+            
+            for (let i = 0; i < numMatches; i++) {
+                const startIndex = Math.floor(Math.random() * (words.length - 5));
+                const length = Math.floor(Math.random() * 5) + 3;
+                const matchedText = words.slice(startIndex, startIndex + length).join(' ');
+                
+                matches.push({
+                    text: matchedText,
+                    source: `example${i + 1}.com/article-${Math.floor(Math.random() * 1000)}`,
+                    similarity: Math.floor(Math.random() * 20) + 80
+                });
+            }
+            
+            return matches;
+        }
+        
+        function updateMatchedSources(matches) {
+            const sourcesContainer = document.getElementById('matchedSources');
+            sourcesContainer.innerHTML = '';
+            
+            if (matches.length === 0) {
+                sourcesContainer.innerHTML = '<p class="text-muted mb-0">No matching sources found.</p>';
+                return;
+            }
+            
+            matches.forEach(match => {
+                const sourceElement = document.createElement('div');
+                sourceElement.className = 'list-group-item';
+                sourceElement.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${match.source}</h6>
+                            <p class="mb-1 text-muted small">"${match.text}"</p>
+                        </div>
+                        <span class="badge bg-primary">${match.similarity}% match</span>
+                    </div>
+                `;
+                sourcesContainer.appendChild(sourceElement);
+            });
+        }
+        
+        function highlightText(text, matches) {
+            const analysisContainer = document.getElementById('textAnalysis');
+            let highlightedText = text;
+            
+            // Highlight matched portions
+            matches.forEach(match => {
+                const regex = new RegExp(match.text, 'gi');
+                highlightedText = highlightedText.replace(regex, `<mark class="bg-warning">${match.text}</mark>`);
+            });
+            
+            analysisContainer.innerHTML = highlightedText;
+        }
+    </script>
+</body>
+</html> 
